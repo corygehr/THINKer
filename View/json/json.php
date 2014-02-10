@@ -17,6 +17,8 @@ class THINKER_View_json extends THINKER_View_Common
      */
     public function display()
     {
+    	global $_INFO, $_MESSAGES;
+    	
 	    // Display the header
         header('Content-type: application/json; charset=utf-8');
 		
@@ -28,7 +30,12 @@ class THINKER_View_json extends THINKER_View_Common
 		else
 		{
 		    // Return the encoded data
-            echo json_encode($this->model->getData());
+		    $output = array(
+		    	'INFO' => $_INFO,
+		    	'MESSAGES' => $_MESSAGES,
+		    	'DATA' => $this->section->getData());
+
+            echo json_encode($output);
         }
     }
 }

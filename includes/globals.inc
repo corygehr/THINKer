@@ -9,6 +9,7 @@
 
 // System
 $_DB       = null;    // Database connection
+$_INFO     = array(); // Application Information
 $_MESSAGES = array(); // Message storage
 
 // Section variables

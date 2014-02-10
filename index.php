@@ -89,6 +89,11 @@ if(file_exists($sectionFile))
 		trigger_error("Subsection does not exist.", E_USER_ERROR);
 	}
 
+	// Compile info array
+	$_INFO['environment'] = $config['thinker_general']['environment'];
+	$_INFO['section'] = $_SECTION;
+	$_INFO['subsection'] = $_SUBSECTION;
+
 	if($result)
 	{
 		// Create a view

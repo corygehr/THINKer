@@ -16,9 +16,7 @@ class THINKER_Section_Start extends THINKER_Section
 	 */
 	public function info()
 	{
-		$message = "
-		Welcome to the THINKer. How can I assist you today?
-		";
+		$message = "Welcome to the THINKer. How can I assist you today?";
 
 		$this->set('message', $message);
 
