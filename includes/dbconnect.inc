@@ -25,7 +25,7 @@ class DBConnection extends PDO
 		$type = $connectParams['db_credentials']['driver'];
 
 		// DSN Properties
-		$host = $connectParams['db_dsn']['hostname'];
+		$host = $connectParams['db_dsn']['host'];
 		$port = $connectParams['db_dsn']['port'];
 		$schema = $connectParams['db_dsn']['schema'];
 
@@ -33,7 +33,7 @@ class DBConnection extends PDO
 		$options = $connectParams['db_pdo_options'];
 
 		// Data Source String
-		$dsn = $type . ":dbmame=$schema;host=$host:$port";
+		$dsn = $type . ":dbname=$schema;host=$host;port=$port";
 
 		// Attempt to make connection
 		try
