@@ -1,26 +1,26 @@
 <?php
 	/**
 	 * csv.php
-	 * Contains the THINK_View_csv class
+	 * Contains the THINKER_View_csv class
 	 * Outputs a CSV file with the passed data
 	 *
 	 * @author Cory Gehr
 	 * @version 0.1
 	 */
-class THINK_View_csv extends THINK_View_Common
+class THINKER_View_csv extends THINKER_View_Common
 {
 	/**
 	 * __construct()
-	 * Constructor for the THINK_View_csv Class
+	 * Constructor for the THINKER_View_csv Class
 	 *
 	 * @author Cory Gehr
 	 * @access public
-	 * @param THINK_Model $model: Model being displayed
+	 * @param THINKER_Section $section: Section being displayed
 	 */
-	public function __construct(THINK_Model $model)
+	public function __construct(THINKER_Section $section)
 	{
-		// Call the constructor in THINK_View_Common (sets the Model)
-		parent::__construct($model);
+		// Call the constructor in THINKER_View_Common (sets the Section)
+		parent::__construct($section);
 	}
 
 	/**
@@ -32,16 +32,16 @@ class THINK_View_csv extends THINK_View_Common
 	 */
 	public function display()
 	{
-		// Call the constructor in THINK_View_Common
+		// Call the constructor in THINKER_View_Common
 		
 		// Headers to tell the browser to download a file
 		header('Content-type: text/csv; charset=utf-8');
-		header('Content-Disposition: attachment; filename="' . $this->model->modelName . '.csv"');
+		header('Content-Disposition: attachment; filename="' . $this->section->modelName . '.csv"');
 		header('Pragma: no-cache');
 		header('Expires: 0');
 		
 		// Get the data
-		$tmpData = $this->model->getData();
+		$tmpData = $this->section->getData();
 		
 		// Get the resultset we should use
 		$set = getPageVar('set', 'str');
@@ -114,7 +114,7 @@ class THINK_View_csv extends THINK_View_Common
 		else
 		{
 			$header = null;
-			$expdata = "No Records Found or else this Model does not support CSV Exports.";
+			$expdata = "No Records Found or else this Section does not support CSV Exports.";
 		}
 		
 		// Output data

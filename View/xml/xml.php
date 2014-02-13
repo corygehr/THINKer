@@ -20,8 +20,8 @@ class THINKER_View_xml extends THINKER_View_Common
         header('Content-type: text/xml');
 		
 		// Get data
-		$name = $this->model->modelName;
-		$data = $this->model->getData();
+		$name = $this->section->sectionName;
+		$data = $this->section->getData();
 		
 		// Get the resultset we should use
 		$set = getPageVar('set', 'int', 0);
