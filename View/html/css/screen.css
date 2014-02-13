@@ -1,5 +1,44 @@
 html {
 	background-color: #3691BE;
-	border: 0;
 	font-family: "Segoe UI", Frutiger, "Frutiger Linotype", "Dejavu Sans", "Helvetica Neue", Arial, sans-serif;
+}
+
+body {
+	border: 0;
+	margin: 0;
+	padding: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+	margin: 1%;
+}
+
+input,
+select,
+textarea {
+	border: 1px solid #333;
+	font-family: "Segoe UI", Frutiger, "Frutiger Linotype", "Dejavu Sans", "Helvetica Neue", Arial, sans-serif;
+}
+
+fieldset {
+	width: 100%;
+}
+
+div#head-wrapper {
+	background: #333;
+	height: 4.5em;
+	width: 100%;
+}
+
+div#main-wrapper {
+	-webkit-box-shadow: 0px 10px 5px 0px rgba(50, 50, 50, 0.5);
+	-moz-box-shadow: 0px 10px 5px 0px rgba(50, 50, 50, 0.5);
+	box-shadow: 0px 10px 5px 0px rgba(50, 50, 50, 0.5);
+	background: #eee;
+	padding: 1em;
+	width: 100%;
 }
