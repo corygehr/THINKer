@@ -88,7 +88,6 @@ div.success {
 div#head-wrapper {
 	background: #333;
 	height: 4.5em;
-	overflow: auto;
 	padding: 0 1em;
 	width: auto;
 }
@@ -96,6 +95,16 @@ div#head-wrapper {
 div#head-wrapper img:hover {
 	background: #222;
 	cursor: pointer;
+}
+
+div#head-wrapper img:active {
+	background: #111;
+	cursor: pointer;
+}
+
+div#head-container {
+	height: auto;
+	width: auto;
 }
 
 div#main-wrapper {
