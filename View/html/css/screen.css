@@ -32,24 +32,24 @@ textarea {
 }
 
 input[type='submit'] {
-	background: #ccc;
+	background: #3691BE;
 	border: 0;
+	color: #fff;
 	cursor: pointer;
-	font-family: "Segoe UI";
 	padding: 0.5em 1em;
 }
 
 input[type='submit']:active {
-	background: #aaa;
+	background: #3691BE;
 }
 
-input[type='submit']:disabled {
-	background: #ddd;
-	cursor: default;
+input[type='submit']:disabled, input[type='submit']:disabled:hover {
+	background: #ccc;
+	color: #666;
 }
 
 input[type='submit']:hover {
-	background: #bbb;
+	background: #2B88AD;
 }
 
 fieldset {
@@ -63,6 +63,32 @@ legend {
 	margin-bottom: 0.5em;
 	padding-bottom: 0.5em;
 	width: 100%;
+}
+
+table {
+	border-collapse: collapse;
+	margin: auto;
+	margin-bottom: 20px;
+	width: 100%;
+}
+
+table, th, td {
+	border: 0px;
+}
+
+th, td {
+	padding: 10px 5px;
+}
+
+th {
+	background: #3691BE;
+	color: #fff;
+	font-weight: normal;
+	text-align: left;
+}
+
+tbody tr:nth-of-type(even) {
+	background: #8bc7df;
 }
 
 div.notification {
@@ -105,6 +131,17 @@ div#head-wrapper img:active {
 div#head-container {
 	height: auto;
 	width: auto;
+}
+
+div#head-container span#head-nav {
+	color: #fff;
+	float: right;
+	text-align: right;
+}
+
+div#head-container span#head-nav li {
+	display: inline;
+	list-style-type: none;
 }
 
 div#main-wrapper {
