@@ -163,27 +163,32 @@ ol#nav-steps {
 }
 
 ol#nav-steps li {
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
 	background: #DDD;
-	cursor: pointer;
 	display: table-cell;
-	font-size: 1.5em;
 	height: inherit;
-	margin: auto 0;
-	text-align: center;
-	vertical-align: middle;
+	padding: 0 auto;
 	width: 300px;
 }
 
 ol#nav-steps li a {
 	color: #000;
 	display: block;
+	font-size: 1.5em;
+	height: 100%;
+	line-height: 3.15em;
+	text-align: center;
 	text-decoration: none;
+	vertical-align: middle;
+	width: 100%;
+}
+
+ol#nav-steps li a.disabled {
+	color: #999;
+}
+
+ol#nav-steps li a.disabled:hover {
+	background: #DDD;
+	cursor: default;
 }
 
 ol#nav-steps li:hover {
