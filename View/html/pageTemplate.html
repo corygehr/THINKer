@@ -16,25 +16,18 @@
 <body>
 	<div id='head-wrapper'>
 		<div id='head-container'>
-			<span id='head-image'>
+			<div id='head-image'>
 				<img src='images/logo.png' alt='THINKer'>
-			</span>
-			<span id='head-nav'>
-				<ul>
-					<li>My Profile</li>
-					<li>Settings</li>
-					<li>Shared Views</li>
-				</ul>
-			</span>
+			</div>
 		</div>
 	</div>
 	<div id='main-wrapper'>
 		<div id='steps-container'>
 			<ol id='nav-steps'>
-				<li>Pick Data Source</li>
-				<li>Choose Data Points</li>
-				<li>Add Filters</li>
-				<li>Review Data</li>
+				<li class='active'><a href='#pick-ds'>1. Pick Data Source</a></li>
+				<li><a href='#pick-data-points'>2. Choose Data Points</a></li>
+				<li><a href='#add-filters'>3. Add Filters</a></li>
+				<li><a href='#review-data'>4. Review Data</a></li>
 			</ol>
 		</div>
 		<div id='content-container'>
@@ -46,6 +39,9 @@
 			</div>
 			<div class='notification success'>
 				<strong>Success:</strong> Something good happened.
+			</div>
+			<div class='notification info'>
+				<strong>Info:</strong> Something happened.
 			</div>
 			<h1>Heading 1</h1>
 			<h2>Heading 2</h2>
@@ -148,12 +144,14 @@
 					</tr>
 				</tbody>
 				<tfoot>
-					<th>Column 1</th>
-					<th>Column 2</th>
-					<th>Column 3</th>
-					<th>Column 4</th>
-					<th>Column 5</th>
-					<th>Column 6</th>
+					<tr>
+						<th>Column 1</th>
+						<th>Column 2</th>
+						<th>Column 3</th>
+						<th>Column 4</th>
+						<th>Column 5</th>
+						<th>Column 6</th>
+					</tr>
 				</tfoot>
 			</table>
 		</div>
