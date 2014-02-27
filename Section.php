@@ -8,7 +8,7 @@
 	 
 abstract class THINKER_Section
 {
-	protected $classInfo; // Contains information about the class (ReflectionClass)
+	protected $reflectionClass; // Contains information about the class (ReflectionClass)
 	protected $data;      // Contains the data being passed back from the Section
 	
 	public $view;      // Contains the view being loaded for the section
@@ -23,7 +23,7 @@ abstract class THINKER_Section
 	public function __construct()
 	{
 		// Initialize classInfo with information about the target class
-		$this->classInfo = new ReflectionClass($this);
+		$this->reflectionClass = new ReflectionClass($this);
 		$this->data = array();
 
 		// Override view if necessary
@@ -72,12 +72,12 @@ abstract class THINKER_Section
 	 */
 	public function toArray()
 	{
-		$defaults = $this->classInfo->getDefaultProperties();
+		$defaults = $this->reflectionClass->getDefaultProperties();
 		$return = array();
 		
 		foreach($defaults as $var => $val)
 		{
-			if($this->$var instanceof THINK_Object)
+			if($this->$var instanceof THINKER_Object)
 			{
 				$return[$var] = $this->$var->toArray();
 			}

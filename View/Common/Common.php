@@ -17,7 +17,7 @@ class THINKER_View_Common extends THINKER_View
 	 * @author Cory Gehr
 	 * @access public
 	 */
-	public function __construct(THINK_Section $section)
+	public function __construct(THINKER_Section $section)
 	{
 		// Set the local section
 		$this->section = $section;

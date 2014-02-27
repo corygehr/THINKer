@@ -124,19 +124,58 @@ div#head-wrapper {
 	width: auto;
 }
 
-div#head-wrapper img:hover {
-	background: #222;
-	cursor: pointer;
-}
-
-div#head-wrapper img:active {
-	background: #111;
-	cursor: pointer;
-}
-
 div#head-container {
+	color: #fff;
 	height: inherit;
 	width: auto;
+}
+
+div#head-container a {
+	color: #fff;
+	text-decoration: none;
+	vertical-align: middle;
+}
+
+div#head-container a:hover {
+	color: #ddd;
+}
+
+div#head-container img {
+	cursor: pointer;
+	float: left;
+}
+
+div#head-container img:hover {
+	background: #222;
+}
+
+div#head-container img:active {
+	background: #111;
+}
+
+div#head-container p.user-info {
+	display: relative;
+	float: right;
+	font-size: 0.85em;
+	margin: 0.5em;
+	padding: 0;
+}
+
+div#head-usernav {
+	clear: right;
+	display: relative;
+	float: right;
+	font-size: 1.15em;
+}
+
+div#head-usernav ul {
+	margin: 0;
+	padding: 0;
+}
+
+div#head-usernav li {
+	display: inline-block;
+	margin: 0 0.75em;
 }
 
 div#main-wrapper {

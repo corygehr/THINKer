@@ -20,7 +20,7 @@ class THINKER_View
 	 * @param $section: Section being displayed
 	 * @return View of Section, or Error on Failure
 	 */
-	public static function factory($view, THINK_Section $section)
+	public static function factory($view, THINKER_Section $section)
 	{
 		// Generate the View's File Name
 		$viewFile = "View/$view/$view.php";

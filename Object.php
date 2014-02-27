@@ -8,7 +8,7 @@
 	 
 abstract class THINKER_Object
 {
-	protected $classInfo;	// Contains information about the class (ReflectionClass)
+	protected $reflectionClass;	// Contains information about the class (ReflectionClass)
 	
 	/**
 	 * __construct()
@@ -19,8 +19,8 @@ abstract class THINKER_Object
 	 */
 	public function __construct()
 	{
-		// Initialize classInfo with information about the target class
-		$this->classInfo = new ReflectionClass($this);
+		// Initialize reflectionClass with information about the target class
+		$this->reflectionClass = new ReflectionClass($this);
 	}
 	
 	/**
@@ -33,12 +33,12 @@ abstract class THINKER_Object
 	 */
 	public function toArray()
 	{
-		$defaults = $this->classInfo->getDefaultProperties();
+		$defaults = $this->reflectionClass->getDefaultProperties();
 		$return = array();
 		
 		foreach($defaults as $var => $val)
 		{
-			if($this->$var instanceof THINK_Object)
+			if($this->$var instanceof THINKER_Object)
 			{
 				$return[$var] = $this->$var->toArray();
 			}
