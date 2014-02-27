@@ -26,7 +26,7 @@ if((isset($_GET['proceed']) && $_GET['proceed']))
 	 
 		// Run the commands for output
 		$output = '';
-		foreach($commands AS $command){
+		foreach($commands AS $command) {
 			// Run it
 			$tmp = shell_exec($command);
 			// Output
@@ -55,9 +55,8 @@ if((isset($_GET['proceed']) && $_GET['proceed']))
 </body>
 </html>
 <?php
-		// Kill script
-		exit();
-	}
+	// Kill script
+	exit();
 }
 
 // Output a 404 if all else fails
