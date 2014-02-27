@@ -91,6 +91,26 @@ tbody tr:nth-of-type(even) {
 	background: #8bc7df;
 }
 
+div#steps-container {
+	height: 5em;
+	margin: 0;
+	padding: 1em;
+	width: auto;
+}
+
+ol#nav-steps {
+	background: #DDD;
+	margin: 0;
+	padding: 0;
+	width: auto;
+}
+
+ol#nav-steps li {
+	display: inline;
+	font-size: 1.25em;
+	padding: 1em 2em;
+}
+
 div.notification {
 	margin: 1em 0;
 	padding: 1.5em 1em;
