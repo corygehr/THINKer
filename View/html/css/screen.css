@@ -154,7 +154,6 @@ div#head-container img:active {
 }
 
 div#head-container p.user-info {
-	display: relative;
 	float: right;
 	font-size: 0.85em;
 	margin: 0.5em;
@@ -163,7 +162,6 @@ div#head-container p.user-info {
 
 div#head-usernav {
 	clear: right;
-	display: relative;
 	float: right;
 	font-size: 1.15em;
 }
@@ -178,6 +176,18 @@ div#head-usernav li {
 	margin: 0 0.75em;
 }
 
+@media screen and (max-width: 625px) {
+    div#head-usernav {
+    	font-size: 0.85em;
+    	margin-top: 0.7em;
+    }
+
+	div#head-usernav li {
+		display: inline-block;
+		margin: 0 0.5em;
+	}
+}
+
 div#main-wrapper {
 	-webkit-box-shadow: 0px 10px 5px 0px rgba(50, 50, 50, 0.5);
 	-moz-box-shadow: 0px 10px 5px 0px rgba(50, 50, 50, 0.5);
@@ -189,45 +199,31 @@ div#main-wrapper {
 }
 
 div#steps-container {
-	margin: 1em 0;
 	width: auto;
 }
 
 ol#nav-steps {
 	background: #DDD;
-	height: 5em;
-	margin: 1em 0;
+	margin: 0;
 	padding: 0;
 	width: auto;
 }
 
 ol#nav-steps li {
 	background: #DDD;
-	display: table-cell;
-	height: inherit;
-	padding: 0 auto;
-	width: 300px;
+	display: inline-block;
+	margin: 0;
+	padding: 1.5em 0.5em;
+	text-align: center;
+	vertical-align: middle;
+	width: 200px;
 }
 
 ol#nav-steps li a {
 	color: #000;
-	display: block;
-	font-size: 1.5em;
+	font-size: 1.25em;
 	height: 100%;
-	line-height: 3.15em;
-	text-align: center;
 	text-decoration: none;
-	vertical-align: middle;
-	width: 100%;
-}
-
-ol#nav-steps li a.disabled {
-	color: #999;
-}
-
-ol#nav-steps li a.disabled:hover {
-	background: #DDD;
-	cursor: default;
 }
 
 ol#nav-steps li:hover {
