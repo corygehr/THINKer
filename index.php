@@ -115,11 +115,10 @@ if(file_exists($sectionFile))
 }
 else
 {
-	// Throw error
-	trigger_error("Page not found.", E_USER_ERROR);
+	// Error redirect
+	errorRedirect(404);
 }
 
 // Close database connection
 $_DB = null;
-
 ?>

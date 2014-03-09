@@ -36,6 +36,19 @@ function __autoload($class)
 }
 
 /**
+ * errorRedirect()
+ * Redirects to an error page
+ *
+ * @author Cory Gehr
+ * @param $no: Error Number (default: 404)
+ */
+function errorRedirect($no = 404)
+{
+	// Call current redirect function
+	redirect('Error', 'info', array('no' => $no));
+}
+
+/**
  * getPageVar()
  * Gets a variable submitted to the page
  *
@@ -130,13 +143,15 @@ function getPath($class)
  * pushMessage()
  * Pushes a message to the message cache
  *
- * @author Cory gehr
+ * @author Cory Gehr
  * @param $text: Message Text
  * @param $level: Message Level (info, error, warning, success) (default: info)
  * @param $overrwrite: Flag that would remove all other messages and add this one (default: false)
  */
 function pushMessage($text, $level = 'info', $overwrite = false)
 {
+	global $_MESSAGES;
+
 	if($overwrite)
 	{
 		$_MESSAGES = array();
@@ -147,6 +162,40 @@ function pushMessage($text, $level = 'info', $overwrite = false)
 		0 => $text,
 		1 => $level
 		);
+}
+
+/**
+ * redirect()
+ * Redirects the user to the specified area
+ *
+ * @author Cory Gehr
+ * @param $section: Section Name
+ * @param $subsection: Subsection Name (default: null)
+ * @param $parameters: URL Parameters in an associative array (default: null)
+ */
+function redirect($section, $subsection = null, $parameters = null)
+{
+	// Build URL
+	$url = BASE_URL . "index.php?section=$section";
+
+	// Add subsection if provided
+	if($subsection)
+	{
+		$url .= "&subsection=$subsection";
+	}
+
+	// Add arguments if necessary
+	if(count($parameters) > 0)
+	{
+		foreach($parameters as $key => $value)
+		{
+			$url .= ("&$key=" . urlencode($value));
+		}
+	}
+
+	// Perform redirect
+	header('Location: ' . $url);
+	exit();
 }
 
 /**

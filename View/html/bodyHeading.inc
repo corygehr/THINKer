@@ -22,3 +22,4 @@
 		</div>
 	</div>
 	<div id='main-wrapper'>
+		<div id='content-container'>

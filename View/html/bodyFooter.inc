@@ -6,6 +6,7 @@
 	 * @author Cory Gehr
 	 */
 ?>
+		</div>
 	</div>
 	<div id='footer-wrapper'>
 		<p>

@@ -50,6 +50,26 @@ abstract class THINKER_Section
 	}
 
 	/**
+	 * getVal()
+	 * Gets a value from this object
+	 *
+	 * @access public
+	 * @param $name: Name of the Variable
+	 * @return Variable Value, or NULL on non-existence
+	 */
+	public function getVal($name)
+	{
+		if(isset($this->data[$name]))
+		{
+			return $this->data[$name];
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	/**
 	 * set()
 	 * Sets a value in the local data array
 	 *
