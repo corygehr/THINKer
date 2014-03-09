@@ -86,7 +86,8 @@ if(file_exists($sectionFile))
 	}
 	else
 	{
-		trigger_error("Subsection does not exist.", E_USER_ERROR);
+		// Error redirect
+		errorRedirect(404);
 	}
 
 	// Compile info array

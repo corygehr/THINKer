@@ -133,7 +133,7 @@ function getPath($class)
 	else
 	{
 		// == 2 means it will be in the root directory (THINKER_Object, THINKER_Section, etc.)
-		$classFile = '/';
+		$classFile = './';
 	}
 
 	return $classFile;
