@@ -70,6 +70,8 @@ class THINKER_View_html extends THINKER_View_Common
 						$output .= "info'><strong>Info:</strong> $text</div>";
 					break;
 				}
+
+				echo $output;
 			}
 		}
 

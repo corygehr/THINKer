@@ -9,7 +9,8 @@
 abstract class THINKER_Section
 {
 	protected $reflectionClass; // Contains information about the class (ReflectionClass)
-	protected $data;      // Contains the data being passed back from the Section
+	protected $data;            // Contains the data being passed back from the Section
+	protected $session;         // Contains session data
 	
 	public $view;      // Contains the view being loaded for the section
 	
@@ -35,8 +36,13 @@ abstract class THINKER_Section
 		{
 			$this->view = DEFAULT_VIEW;
 		}
+
+		// Get the session information
+		$sessionClass = SESSION_CLASS;
+		
+		$this->session = $sessionClass::singleton();
 	}
-	
+
 	/**
 	 * getData()
 	 * Passes back the data array from this section

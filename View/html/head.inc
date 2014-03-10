@@ -7,7 +7,7 @@
 	 */
 
 ?>
-	<title>Start | THINKer</title>
+	<title>THINKer</title>
 	<link rel='stylesheet' href='View/html/css/screen.css' type='text/css' media='screen'>
 	<link href='View/html/css/jquery/jquery-ui-1.10.4.custom.min.css' rel='stylesheet'>
 	<meta http-equiv='Content-Type' content='text/html;charset=utf-8'>

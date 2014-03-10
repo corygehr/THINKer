@@ -36,6 +36,37 @@ function __autoload($class)
 }
 
 /**
+ * createUrl()
+ * Creates a local, internal URL
+ *
+ * @author Cory Gehr
+ * @param $section: Section Name
+ * @param $subsection: Subsection Name (default: null)
+ * @param $params: URL Parameters (default: empty array)
+ * @return Full URL to Item
+ */
+function createUrl($section, $subsection = null, $params = array())
+{
+	$url =	BASE_URL . 'index.php?section=' . urlencode($section);
+
+	if($subsection)
+	{
+		$url .= "&subsection=" . urlencode($subsection);
+	}
+	
+	// Add URL Parameters
+	if(count($params) > 0)
+	{
+		foreach($params as $key => $value)
+		{
+			$url .= ("&$key=" . urlencode($value));
+		}
+	}
+	
+	return $url;
+}
+
+/**
  * errorRedirect()
  * Redirects to an error page
  *
@@ -93,7 +124,7 @@ function getPageVar($name, $type = 'str', $source, $required = false, $allowHtml
 	elseif($required)
 	{
 		// Throw error
-		trigger_error("Required variable <i>$name</i> was not specified.");
+		trigger_error("Required variable '$name' was not specified");
 	}
 
 	return null;
@@ -171,27 +202,12 @@ function pushMessage($text, $level = 'info', $overwrite = false)
  * @author Cory Gehr
  * @param $section: Section Name
  * @param $subsection: Subsection Name (default: null)
- * @param $parameters: URL Parameters in an associative array (default: null)
+ * @param $params: URL Parameters in an associative array (default: empty array)
  */
-function redirect($section, $subsection = null, $parameters = null)
+function redirect($section, $subsection = null, $params = array())
 {
-	// Build URL
-	$url = BASE_URL . "index.php?section=$section";
-
-	// Add subsection if provided
-	if($subsection)
-	{
-		$url .= "&subsection=$subsection";
-	}
-
-	// Add arguments if necessary
-	if(count($parameters) > 0)
-	{
-		foreach($parameters as $key => $value)
-		{
-			$url .= ("&$key=" . urlencode($value));
-		}
-	}
+	// Create URL
+	$url = createUrl($section, $subsection, $params);
 
 	// Perform redirect
 	header('Location: ' . $url);

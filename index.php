@@ -21,6 +21,7 @@ define('BASE_URL', ($config['thinker_general']['use_ssl'] == true ? 'https://' :
 define('ENVIRONMENT', $config['thinker_general']['environment']);
 define('CLASS_PREFIX', $config['thinker_general']['class_prefix']);
 define('DEFAULT_VIEW', $config['thinker_general']['default_view']);
+define('SESSION_CLASS', CLASS_PREFIX . 'Session_' . $config['thinker_general']['session_class']);
 
 // Set error handler
 set_error_handler('thinkerErrorHandler');
