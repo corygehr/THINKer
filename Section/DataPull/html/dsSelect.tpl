@@ -9,10 +9,10 @@
 <h1>Welcome!</h1>
 <div id='steps-container'>
 	<ol id='nav-steps'>
-		<li class='active'><a href='#'>1. Pick Data Source</a></li>
-		<li><a class='disabled'>2. Choose Data Points</a></li>
-		<li><a class='disabled'>3. Add Filters</a></li>
-		<li><a class='disabled'>4. Review Data</a></li>
+		<li class='active'>1. Pick Data Source</li>
+		<li>2. Choose Data Points</li>
+		<li>3. Add Filters</li>
+		<li>4. Review Data</li>
 	</ol>
 </div>
 <p>
