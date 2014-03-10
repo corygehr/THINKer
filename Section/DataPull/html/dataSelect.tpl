@@ -9,40 +9,42 @@
 <h1>Data Selection</h1>
 <div id='steps-container'>
 	<ol id='nav-steps'>
-		<li><a class='disabled'>1. Pick Data Source</a></li>
-		<li class='active'><a href='#'>2. Choose Data Points</a></li>
-		<li><a class='disabled'>3. Add Filters</a></li>
-		<li><a class='disabled'>4. Review Data</a></li>
+		<li class='completed'>1. Pick Data Source</li>
+		<li class='active'>2. Choose Data Points</li>
+		<li>3. Add Filters</li>
+		<li>4. Review Data</li>
 	</ol>
 </div>
 <p>
-	Now, choose the data you'd like to pull from '<?php echo $this->get('schemaName', 'inline') ?>':
+	Now, choose the data you'd like to pull from '<?php echo $this->get('schemaName', 'inline') . '.' . $this->get('tableName', 'inline'); ?>':
 </p>
 <form id='dsSelect' method='post'>
 	<fieldset>
 		<legend>Select Data Points</legend>
-		<label for='source'>Table Name:</label>
-		<br />
-		<select id='source' name='source'>
-			<option>Select One:</option>
-<?php
-	// Get tables from schema
-	$tables = $this->get('tables', 'inline');
-
-	foreach($tables as $t)
-	{
-		list($name, $comment) = $t;
-
-		if(!$comment)
-		{
-			$comment = $name;
-		}
-
-		echo "<option value='$name'>$comment</option>";
-	}
-?>
-		</select>
-		<br />
+		<div id='data-points'>
+			<ul>
+				<li><a href='#tabs-1'>Table 1</a></li>
+				<li><a href='#tabs-2'>Table 2</a></li>
+				<li><a href='#tabs-3'>Table 3</a></li>
+			</ul>
+			<div id='tabs-1'>
+				<p>
+					Table 1 Data checkboxes go here.
+				</p>
+			</div>
+			<div id='tabs-2'>
+				<p>
+					Table 2 Data checkboxes go here.
+				</p>
+			</div>
+			<div id='tabs-3'>
+				<p>
+					Table 3 Data checkboxes go here.
+				</p>
+			</div>
+		</div>
 		<input type='submit' value='Next >' />
 	</fieldset>
 </form>
+
+<script type='text/javascript' src='Section/DataPull/html/dataSelect.js'></script>

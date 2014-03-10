@@ -18,12 +18,12 @@
 <p>
 	Welcome to the THINKer! To begin, please choose a data source below:
 </p>
-<form id='dsSelect' method='post' action='<?php echo createUrl('DataPull', 'dbSelect', array('phase' => 'proceed')); ?>'>
+<form id='dsSelect' method='post' action='<?php echo createUrl('DataPull', 'dsSelect', array('phase' => 'proceed')); ?>'>
 	<fieldset>
 		<legend>Select Data Source</legend>
-		<label for='source'>Data Source:</label>
+		<label for='schema'>Schema:</label>
 		<br />
-		<select id='source' name='source'>
+		<select id='schema' name='schema'>
 			<option>Select One:</option>
 <?php
 	// Get schemata
@@ -37,6 +37,13 @@
 ?>
 		</select>
 		<br />
+		<label for='table'>Table:</label>
+		<br />
+		<select id='table' name='table' disabled>
+			<option>--Choose a Schema to populate this list--</option>
+		</select>
+		<br />
 		<input type='submit' value='Next >' />
 	</fieldset>
 </form>
+<script type='text/javascript' src='Section/DataPull/html/dsSelect.js'></script>

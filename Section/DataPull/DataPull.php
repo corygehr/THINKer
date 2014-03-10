@@ -25,54 +25,73 @@ class THINKER_Section_DataPull extends THINKER_Section
 
 		// Check for schema information
 		$schema = $this->session->__get('PULL_SCHEMA');
+		$table = $this->session->__get('PULL_TABLE');
 
-		if($schema)
+		if($schema && $table)
 		{
-			// Pass back all tables in the schema
-			$this->set('tables', $this->getSchemaTables($schema));
 			$this->set('schemaName', $schema);
+			$this->set('tableName', $table);
 		}
 		else
 		{
 			// Redirect back to database selection
-			redirect('DataPull', 'dbSelect', array('phase' => 'noSchema'));
+			redirect('DataPull', 'dbSelect', array('phase' => 'invalidCombo'));
 		}
 
 		return true;
 	}
 
 	/**
-	 * dbSelect()
-	 * Passes data back for the 'dbSelect' subsection
+	 * dsSelect()
+	 * Passes data back for the 'dsSelect' subsection
 	 *
 	 * @access public
 	 */
-	public function dbSelect()
+	public function dsSelect()
 	{
 		$phase = getPageVar('phase', 'str', 'GET');
 
 		switch($phase)
 		{
+			case 'fetchTables':
+				$schema = getPageVar('schema', 'str', 'GET', true);
+
+				// TODO: Verify valid schema
+				if($schema)
+				{
+					$this->set('tables', $this->getSchemaTables($schema));
+				}
+
+				// This is all we need for this phase -- exit
+				return true;
+			break;
+
+			case 'invalidCombo':
+				pushMessage('An invalid schema/table combination was selected, please try again.', 'error');
+			break;
+
 			case 'noSchema':
 				pushMessage('An invalid schema was selected, please try again.', 'error');
 			break;
 
 			case 'proceed':
 				// Grab selected schema
-				$schema = getPageVar('source', 'str', 'POST', true);
+				$schema = getPageVar('schema', 'str', 'POST', true);
+				$table = getPageVar('table', 'str', 'POST', true);
 
 				// TODO: Verify permissions and name of schema
-				if($schema)
+				if($schema && $table)
 				{
 					// Push to session
 					$this->session->__set('PULL_SCHEMA', $schema);
+					$this->session->__set('PULL_TABLE', $table);
 					
 					// Redirect to next step
 					redirect('DataPull', 'dataSelect');
 				}
 				else
 				{
-					redirect('DataPull', 'dbSelect', array('phase' => 'noSchema'));
+					redirect('DataPull', 'dsSelect', array('phase' => 'noSchema'));
 				}
 			break;
 		}
@@ -96,7 +115,7 @@ class THINKER_Section_DataPull extends THINKER_Section
 
 		$query = "SELECT SCHEMA_NAME
 				  FROM INFORMATION_SCHEMA.SCHEMATA
-				  WHERE SCHEMA_NAME NOT IN ('INFORMATION_SCHEMA', 'PERFORMANCE_SCHEMA')
+				  WHERE SCHEMA_NAME NOT IN ('INFORMATION_SCHEMA', 'PERFORMANCE_SCHEMA', 'mysql', 'thinker', 'phpmyadmin')
 				  ORDER BY SCHEMA_NAME";
 
 		// Fetch results
@@ -128,7 +147,7 @@ class THINKER_Section_DataPull extends THINKER_Section
 		$statement = $_DB->prepare($query);
 		$statement->execute($params);
 
-		return $statement->fetchAll();
+		return $statement->fetchAll(PDO::FETCH_ASSOC);
 	}
 }
 ?>

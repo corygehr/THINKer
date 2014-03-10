@@ -214,7 +214,9 @@ ol#nav-steps {
 
 ol#nav-steps li {
 	background: #DDD;
+	cursor: default;
 	display: inline-block;
+	font-size: 1.25em;
 	margin: 0;
 	padding: 1.5em 0.5em;
 	text-align: center;
@@ -222,23 +224,12 @@ ol#nav-steps li {
 	width: 200px;
 }
 
-ol#nav-steps li a {
-	color: #000;
-	font-size: 1.25em;
-	height: 100%;
-	text-decoration: none;
-}
-
-ol#nav-steps li:hover {
-	background: #CCC;
-}
-
 ol#nav-steps li.active {
 	background: #BBB;
 }
 
-ol#nav-steps li.active:hover {
-	background: #AAA;
+ol#nav-steps li.completed {
+	color: #999;
 }
 
 div#footer-wrapper {
