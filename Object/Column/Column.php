@@ -1,28 +1,31 @@
 <?php
 	/**
-	 * Object/Table.php 
-	 * Contains the THINKER_Object_Table class
+	 * Object/Column.php 
+	 * Contains the THINKER_Object_Column class
 	 *
 	 * @author Cory Gehr
 	 */
 	 
-class THINKER_Object_Table extends THINKER_Object
+class THINKER_Object_Column extends THINKER_Object
 {
-	private $tableName;
-	private $tableEngine;
-	private $tableComment;
-	private $Columns;
-
+	private $columnName;
+	private $columnDefault;
+	private $columnNullable;
+	private $columnType;
+	private $columnMaxLength;
+	private $columnComment;
+	
 	/**
 	 * __construct()
-	 * Constructor for the THINKER_Object_Table Class
+	 * Constructor for the THINKER_Object_Column Class
 	 *
 	 * @author Cory Gehr
 	 * @access public
 	 * @param $schemaName: Schema Name
 	 * @param $tableName: Table Name
+	 * @param $columnName: Column Name
 	 */
-	public function __construct($schemaName, $tableName)
+	public function __construct($schemaName, $tableName, $columnName)
 	{
 		global $_DB;
 
@@ -30,12 +33,15 @@ class THINKER_Object_Table extends THINKER_Object
 		parent::__construct();
 
 		// Query for Table Existence
-		$query = "SELECT TABLE_ENGINE, TABLE_COMMENT
-				  FROM INFORMATION_SCHEMA.TABLES 
-				  WHERE SCHEMA_NAME = :schemaName 
+		$query = "SELECT COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE, 
+				  CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION, 
+				  COLUMN_COMMENT
+				  FROM INFORMATION_SCHEMA.COLUMNS 
+				  WHERE TABLE_SCHEMA = :schemaName 
 				  AND TABLE_NAME = :tableName 
+				  AND COLUMN_NAME = :columnName 
 				  LIMIT 1";
-		$params = array(':schemaName' => $schemaName, ':tableName' => $tableName);
+		$params = array(':schemaName' => $schemaName, ':tableName' => $tableName, ':columnName' => $columnName);
 
 		$statement = $_DB->prepare($query);
 		$statement->execute($params);
@@ -46,121 +52,130 @@ class THINKER_Object_Table extends THINKER_Object
 		if($result)
 		{
 			// Load data into object
-			$this->tableName = $tableName;
-			$this->tableEngine = $result['TABLE_ENGINE'];
-			$this->tableComment = $result['TABLE_COMMENT'];
-			$this->Columns = $this->fetchTableColumns($schemaName, $tableName);
+			$this->columnName = $columnName;
+			$this->columnDefault = $result['COLUMN_DEFAULT'];
+
+			if($result['IS_NULLABLE'] == 'Yes')
+			{
+				$this->columnNullable = true;
+			}
+			else
+			{
+				$this->columnNullable = false;
+			}
+
+			$this->columnType = $result['DATA_TYPE'];
+
+			if($result['CHARACTER_MAXIMUM_LENGTH'])
+			{
+				$this->columnMaxLength = $result['CHARACTER_MAXIMUM_LENGTH'];
+			}
+			elseif($result['NUMERIC_PRECISION'])
+			{
+				$this->columnMaxLength = $result['NUMERIC_PRECISION'];
+			}
+			else
+			{
+				$this->columnMaxLength = null;
+			}
+
+			$this->columnComment = $result['COLUMN_COMMENT'];
 		}
 		else
 		{
 			// Throw error
-			trigger_error("Table '$tableName' in Schema '$schemaName' does not exist");
+			trigger_error("Column '$columnName' in Table '$tableName' in Schema '$schemaName' does not exist");
 		}
 	}
-	
+
 	/**
-	 * getColumn()
-	 * Returns a specific instance of a table column object 
+	 * getColumnComment()
+	 * Returns the comment on the current column
 	 *
 	 * @access public
-	 * @param $columnName: Name of the Column
-	 * @return THINKER_Object_Column Object
+	 * @return Column Comment
 	 */
-	public function getColumn($columnName)
+	public function getColumnComment()
 	{
-		if(isset($this->Columns[$columnName]))
+		return $this->columnComment;
+	}
+
+	/**
+	 * getColumnDefaultValue()
+	 * Returns the default value of the current column
+	 *
+	 * @access public
+	 * @return Column Default Value
+	 */
+	public function getColumnDefaultValue()
+	{
+		return $this->columnDefault;
+	}
+
+	/**
+	 * getColumnFriendlyName()
+	 * Returns the column comment if available, or else returns the column name
+	 *
+	 * @access public
+	 * @return Column Friendly Name
+	 */
+	public function getColumnFriendlyName()
+	{
+		if($this->columnComment)
 		{
-			return $this->Columns[$columnName];
+			return $this->columnComment;
 		}
 		else
 		{
-			return null;
+			return $this->columnName;
 		}
 	}
 
 	/**
-	 * fetchTableColumns()
-	 * Returns an array of the columns contained in the specified table
+	 * getColumnMaxLength()
+	 * Returns the maximum length of the current column
 	 *
 	 * @access public
-	 * @static
-	 * @param $schemaName: Name of the Schema
-	 * @param $tableName: Name of the Table
-	 * @return Array of THINKER_Object_Column Objects
+	 * @return Max Column Length
 	 */
-	public static function fetchTableColumns($schemaName, $tableName)
+	public function getColumnMaxLength()
 	{
-		global $_DB;
-
-		// Query for table names
-		$query = "SELECT COLUMN_NAME 
-				  FROM INFORMATION_SCHEMA.COLUMNS 
-				  WHERE SCHEMA_NAME = :schemaName 
-				  AND TABLE_NAME = :tableName 
-				  ORDER BY TABLE_NAME";
-		$params = array(':schemaName' => $schemaName, ':tableName' => $tableName);
-
-		$statement = $_DB->prepare($query);
-		$result = $statement->execute($params);
-
-		$output = array();
-
-		foreach($result->fetch(PDO::FETCH_ASSOC) as $t)
-		{
-			list($tableName) = $t;
-
-			// Load new tables and add to the output array
-			$output[] = new THINKER_Object_Table($schemaName, $tableName);
-		}
-
-		return $output;
+		return $this->columnMaxLength;
 	}
 
 	/**
-	 * getTableComment()
-	 * Gets the Comment listed for the current Table
+	 * getColumnName()
+	 * Returns the name of the current column
 	 *
 	 * @access public
-	 * @return Table Comment
+	 * @return Column Name
 	 */
-	public function getTableComment()
+	public function getColumnName()
 	{
-		return $this->tableComment;
+		return $this->columnName;
 	}
 
 	/**
-	 * getTableEngine()
-	 * Gets the Engine of the current Table
+	 * getColumnType()
+	 * Returns the data type of the current column
 	 *
 	 * @access public
-	 * @return Table Engine
+	 * @return Column Type
 	 */
-	public function getTableEngine()
+	public function getColumnType()
 	{
-		return $this->tableEngine;
+		return $this->columnType;
 	}
 
 	/**
-	 * getTableName()
-	 * Gets the name of the current table
+	 * isNullable()
+	 * Returns the nullable status of the column
 	 *
 	 * @access public
-	 * @return Table Name
+	 * @return Column Nullable Status
 	 */
-	public function getTableName()
+	public function isNullable()
 	{
-		return $this->tableName;
-	}
-
-	/**
-	 * getTableColumns()
-	 * Returns an array of the columns contained in the current table
-	 *
-	 * @access public
-	 * @return Array of THINKER_Object_Column Objects
-	 */
-	public function getTableColumns()
-	{
-		return $this->Columns;
+		return $this->columnNullable;
 	}
 }

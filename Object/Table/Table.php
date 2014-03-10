@@ -30,9 +30,9 @@ class THINKER_Object_Table extends THINKER_Object
 		parent::__construct();
 
 		// Query for Table Existence
-		$query = "SELECT TABLE_ENGINE, TABLE_COMMENT
+		$query = "SELECT ENGINE, TABLE_COMMENT
 				  FROM INFORMATION_SCHEMA.TABLES 
-				  WHERE SCHEMA_NAME = :schemaName 
+				  WHERE TABLE_SCHEMA = :schemaName 
 				  AND TABLE_NAME = :tableName 
 				  LIMIT 1";
 		$params = array(':schemaName' => $schemaName, ':tableName' => $tableName);
@@ -47,7 +47,7 @@ class THINKER_Object_Table extends THINKER_Object
 		{
 			// Load data into object
 			$this->tableName = $tableName;
-			$this->tableEngine = $result['TABLE_ENGINE'];
+			$this->tableEngine = $result['ENGINE'];
 			$this->tableComment = $result['TABLE_COMMENT'];
 			$this->Columns = $this->fetchTableColumns($schemaName, $tableName);
 		}
@@ -57,7 +57,48 @@ class THINKER_Object_Table extends THINKER_Object
 			trigger_error("Table '$tableName' in Schema '$schemaName' does not exist");
 		}
 	}
-	
+
+	/**
+	 * fetchTableColumns()
+	 * Returns an array of the columns contained in the specified table
+	 *
+	 * @access public
+	 * @static
+	 * @param $schemaName: Name of the Schema
+	 * @param $tableName: Name of the Table
+	 * @return Array of THINKER_Object_Column Objects
+	 */
+	public static function fetchTableColumns($schemaName, $tableName)
+	{
+		global $_DB;
+
+		// Query for table names
+		$query = "SELECT COLUMN_NAME 
+				  FROM INFORMATION_SCHEMA.COLUMNS 
+				  WHERE TABLE_SCHEMA = :schemaName 
+				  AND TABLE_NAME = :tableName 
+				  ORDER BY TABLE_NAME";
+		$params = array(':schemaName' => $schemaName, ':tableName' => $tableName);
+
+		$statement = $_DB->prepare($query);
+		$statement->execute($params);
+		$results = $statement->fetchAll(PDO::FETCH_NUM);
+
+		$output = array();
+
+		if($results)
+		{
+			foreach($results as $c)
+			{
+				list($columnName) = $c;
+				// Load new tables and add to the output array
+				$output[$columnName] = new THINKER_Object_Column($schemaName, $tableName, $columnName);
+			}
+		}
+
+		return $output;
+	}
+
 	/**
 	 * getColumn()
 	 * Returns a specific instance of a table column object 
@@ -79,41 +120,35 @@ class THINKER_Object_Table extends THINKER_Object
 	}
 
 	/**
-	 * fetchTableColumns()
-	 * Returns an array of the columns contained in the specified table
+	 * getTableColumnNames()
+	 * Returns an array of this table's column names
 	 *
 	 * @access public
-	 * @static
-	 * @param $schemaName: Name of the Schema
-	 * @param $tableName: Name of the Table
-	 * @return Array of THINKER_Object_Column Objects
+	 * @return Array of Column Names
 	 */
-	public static function fetchTableColumns($schemaName, $tableName)
+	public function getTableColumnNames()
 	{
-		global $_DB;
-
-		// Query for table names
-		$query = "SELECT COLUMN_NAME 
-				  FROM INFORMATION_SCHEMA.COLUMNS 
-				  WHERE SCHEMA_NAME = :schemaName 
-				  AND TABLE_NAME = :tableName 
-				  ORDER BY TABLE_NAME";
-		$params = array(':schemaName' => $schemaName, ':tableName' => $tableName);
-
-		$statement = $_DB->prepare($query);
-		$result = $statement->execute($params);
-
 		$output = array();
 
-		foreach($result->fetch(PDO::FETCH_ASSOC) as $t)
+		// Names are contained in each index
+		foreach($this->Columns as $index => $object)
 		{
-			list($tableName) = $t;
-
-			// Load new tables and add to the output array
-			$output[] = new THINKER_Object_Table($schemaName, $tableName);
+			$output[] = $index;
 		}
 
 		return $output;
+	}
+
+	/**
+	 * getTableColumns()
+	 * Returns an array of all the table columns
+	 *
+	 * @access public
+	 * @return Array of Table Columns
+	 */
+	public function getTableColumns()
+	{
+		return $this->Columns;
 	}
 
 	/**
@@ -141,6 +176,25 @@ class THINKER_Object_Table extends THINKER_Object
 	}
 
 	/**
+	 * getTableFriendlyName()
+	 * Returns the Table Comment if Available, or else returns the Table Name
+	 *
+	 * @access public
+	 * @return Table Friendly Name
+	 */
+	public function getTableFriendlyName()
+	{
+		if($this->tableComment)
+		{
+			return $this->tableComment;
+		}
+		else
+		{
+			return $this->tableName;
+		}
+	}
+
+	/**
 	 * getTableName()
 	 * Gets the name of the current table
 	 *
@@ -150,17 +204,5 @@ class THINKER_Object_Table extends THINKER_Object
 	public function getTableName()
 	{
 		return $this->tableName;
-	}
-
-	/**
-	 * getTableColumns()
-	 * Returns an array of the columns contained in the current table
-	 *
-	 * @access public
-	 * @return Array of THINKER_Object_Column Objects
-	 */
-	public function getTableColumns()
-	{
-		return $this->Columns;
 	}
 }

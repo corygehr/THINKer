@@ -14,16 +14,12 @@ $('#schema').on('change', function() {
 				$('#table').html('<option>Select One:</option>');
 				// Add options
 				$.each(data['DATA']['tables'], function(i, item) {
-					// Get display name
-					var text = item.TABLE_COMMENT;
-					if(!text.trim()) {
-						text = item.TABLE_NAME;
-					}
-
+					var val = item[0];
+					var text = item[1];
 					// Add item to table
 					$("#table")
 						.append($("<option></option>")
-						.attr("value", item.TABLE_NAME)
+						.attr("value", val)
 						.text(text));
 				});
 				// Enable dropdown

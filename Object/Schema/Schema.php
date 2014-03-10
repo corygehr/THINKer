@@ -34,9 +34,9 @@ class THINKER_Object_Schema extends THINKER_Object
 		$params = array(':schemaName' => $schemaName);
 
 		$statement = $_DB->prepare($query);
-		$result = $statement->execute($params);
+		$statement->execute($params);
 
-		if($result->fetchColumn(0) == 1)
+		if($statement->fetchColumn(0) == 1)
 		{
 			// Load schema tables
 			$this->schemaName = $schemaName;
@@ -65,21 +65,57 @@ class THINKER_Object_Schema extends THINKER_Object
 		// Query for table names
 		$query = "SELECT TABLE_NAME
 				  FROM INFORMATION_SCHEMA.TABLES
-				  WHERE SCHEMA_NAME = :schemaName 
+				  WHERE TABLE_SCHEMA = :schemaName 
 				  ORDER BY TABLE_NAME";
 		$params = array(':schemaName' => $schemaName);
 
 		$statement = $_DB->prepare($query);
-		$result = $statement->execute($params);
+		$statement->execute($params);
+		$results = $statement->fetchAll(PDO::FETCH_NUM);
 
 		$output = array();
 
-		foreach($result->fetch(PDO::FETCH_ASSOC) as $t)
+		if($results)
 		{
-			list($tableName) = $t;
+			foreach($results as $t)
+			{
+				list($tableName) = $t;
+				// Load new tables and add to the output array
+				$output[$tableName] = new THINKER_Object_Table($schemaName, $tableName);
+			}
+		}
 
-			// Load new tables and add to the output array
-			$output[] = new THINKER_Object_Table($schemaName, $tableName);
+		return $output;
+	}
+
+	/**
+	 * getLocalSchemata()
+	 * Gets all of the local schemata on this server
+	 *
+	 * @access public
+	 * @static
+	 * @return Array of Schemata
+	 */
+	public static function getLocalSchemata()
+	{
+		global $_DB;
+
+		$query = "SELECT SCHEMA_NAME
+				  FROM INFORMATION_SCHEMA.SCHEMATA
+				  WHERE SCHEMA_NAME NOT IN ('INFORMATION_SCHEMA', 'PERFORMANCE_SCHEMA', 'mysql', 'thinker', 'phpmyadmin')
+				  ORDER BY SCHEMA_NAME";
+
+		// Fetch results
+		$statement = $_DB->prepare($query);
+		$statement->execute();
+		$results = $statement->fetchAll();
+
+		$output = array();
+
+		foreach($results as $s)
+		{
+			list($schemaName) = $s;
+			$output[] = $s;
 		}
 
 		return $output;
@@ -95,6 +131,26 @@ class THINKER_Object_Schema extends THINKER_Object
 	public function getSchemaName()
 	{
 		return $this->schemaName;
+	}
+
+	/**
+	 * getSchemaTableNames()
+	 * Returns an array of all table names in the current schema
+	 *
+	 * @access public
+	 * @return Array of Table Names (Format: Array(Table Name, Friendly Name))
+	 */
+	public function getSchemaTableNames()
+	{
+		$output = array();
+
+		// Names are contained in each index
+		foreach($this->Tables as $index => $Object)
+		{
+			$output[] = array($index, $Object->getTableFriendlyName());
+		}
+
+		return $output;
 	}
 
 	/**

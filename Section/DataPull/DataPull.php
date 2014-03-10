@@ -54,12 +54,17 @@ class THINKER_Section_DataPull extends THINKER_Section
 		switch($phase)
 		{
 			case 'fetchTables':
-				$schema = getPageVar('schema', 'str', 'GET', true);
+				$schemaName = getPageVar('schema', 'str', 'GET', true);
 
-				// TODO: Verify valid schema
-				if($schema)
+				$Schema = new THINKER_Object_Schema('thinkahead');
+
+				die(var_dump($Schema));
+
+				$Schema = new THINKER_Object_Schema($schemaName);
+
+				if(!empty($Schema))
 				{
-					$this->set('tables', $this->getSchemaTables($schema));
+					$this->set('tables', $Schema->getSchemaTableNames());
 				}
 
 				// This is all we need for this phase -- exit
@@ -97,32 +102,9 @@ class THINKER_Section_DataPull extends THINKER_Section
 		}
 
 		// Pass back the list of schemas in the current database
-		$this->set('schemas', $this->getSchemas());
+		$this->set('schemas', THINKER_Object_Schema::getLocalSchemata());
 
 		return true;
-	}
-
-	/**
-	 * getSchemas()
-	 * Returns a list of schemas on the current database server
-	 *
-	 * @access private
-	 * @return Array of Schemas
-	 */
-	private function getSchemas()
-	{
-		global $_DB;
-
-		$query = "SELECT SCHEMA_NAME
-				  FROM INFORMATION_SCHEMA.SCHEMATA
-				  WHERE SCHEMA_NAME NOT IN ('INFORMATION_SCHEMA', 'PERFORMANCE_SCHEMA', 'mysql', 'thinker', 'phpmyadmin')
-				  ORDER BY SCHEMA_NAME";
-
-		// Fetch results
-		$statement = $_DB->prepare($query);
-		$statement->execute();
-
-		return $statement->fetchAll();
 	}
 
 	/**
