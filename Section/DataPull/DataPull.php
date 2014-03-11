@@ -20,7 +20,13 @@ class THINKER_Section_DataPull extends THINKER_Section
 
 		switch($phase)
 		{
+			case 'noCols':
+				pushMessage('Invalid or no columns selected!', 'error');
+			break;
 
+			case 'proceed':
+				// Gather all possible column selections
+			break;
 		}
 
 		// Check for schema information

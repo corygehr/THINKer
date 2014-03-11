@@ -79,7 +79,7 @@ class THINKER_Object_Table extends THINKER_Object
 				  WHERE KCU.TABLE_SCHEMA = :schemaName 
 				  AND KCU.TABLE_NAME = :tableName 
 				  AND KCU.REFERENCED_TABLE_NAME IS NOT NULL 
-				  ORDER BY KCU.COLUMN_NAME";
+				  ORDER BY C.ORDINAL_POSITION, KCU.COLUMN_NAME";
 		$params = array(':schemaName' => $this->getTableSchema(), ':tableName' => $this->getTableName());
 
 		$statement = $_DB->prepare($query);
