@@ -18,7 +18,7 @@
 <p>
 	Now, choose the data you'd like to pull from <strong><?php echo $this->get('schemaName', 'inline') . ".'" . $this->get('tableName', 'inline') . "'"; ?></strong>:
 </p>
-<form id='dsSelect' method='post' action='<?php echo createUrl('DataPull', 'filterSelect'); ?>'>
+<form id='dataSelect' method='post' action='<?php echo createUrl('DataPull', 'dataSelect', array('phase' => 'proceed')); ?>'>
 	<fieldset>
 		<legend>Select Data Points</legend>
 		<div id='data-points'>

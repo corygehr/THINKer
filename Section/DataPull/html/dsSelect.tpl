@@ -1,7 +1,7 @@
 <?php
     /**
-     * DataPull/html/info.tpl
-     * Contains the HTML template for the dbSelect subsection
+     * DataPull/html/dsSelect.tpl
+     * Contains the HTML template for the dsSelect subsection
      *
      * @author Cory Gehr
      */
