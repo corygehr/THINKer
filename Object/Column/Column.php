@@ -14,6 +14,8 @@ class THINKER_Object_Column extends THINKER_Object
 	private $columnType;
 	private $columnMaxLength;
 	private $columnComment;
+	private $columnTable;
+	private $columnSchema;
 	
 	/**
 	 * __construct()
@@ -52,6 +54,8 @@ class THINKER_Object_Column extends THINKER_Object
 		if($result)
 		{
 			// Load data into object
+			$this->columnSchema = $schemaName;
+			$this->columnTable = $tableName;
 			$this->columnName = $columnName;
 			$this->columnDefault = $result['COLUMN_DEFAULT'];
 
@@ -153,6 +157,30 @@ class THINKER_Object_Column extends THINKER_Object
 	public function getColumnName()
 	{
 		return $this->columnName;
+	}
+
+	/**
+	 * getColumnSchema()
+	 * Returns the name of the column's schema
+	 *
+	 * @access public
+	 * @return Column Schema
+	 */
+	public function getColumnSchema()
+	{
+		return $this->columnSchema;
+	}
+
+	/**
+	 * getColumnTable()
+	 * Returns the name of the column's table
+	 *
+	 * @access public
+	 * @return Column Table
+	 */
+	public function getColumnTable()
+	{
+		return $this->columnTable;
 	}
 
 	/**

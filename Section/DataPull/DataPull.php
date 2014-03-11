@@ -56,15 +56,9 @@ class THINKER_Section_DataPull extends THINKER_Section
 			case 'fetchTables':
 				$schemaName = getPageVar('schema', 'str', 'GET', true);
 
-				$Schema = new THINKER_Object_Schema('thinkahead');
-
-				die(var_dump($Schema));
-
-				$Schema = new THINKER_Object_Schema($schemaName);
-
-				if(!empty($Schema))
+				if($schemaName)
 				{
-					$this->set('tables', $Schema->getSchemaTableNames());
+					$this->set('tables', THINKER_Object_Schema::getSchemaTableNames($schemaName));
 				}
 
 				// This is all we need for this phase -- exit
@@ -105,31 +99,6 @@ class THINKER_Section_DataPull extends THINKER_Section
 		$this->set('schemas', THINKER_Object_Schema::getLocalSchemata());
 
 		return true;
-	}
-
-	/**
-	 * getSchemaTables()
-	 * Returns a list of the tables in the selected schema
-	 *
-	 * @access private
-	 * @param $name: Schema Name
-	 * @return Array of Schema Tables
-	 */
-	private function getSchemaTables($name)
-	{
-		global $_DB;
-
-		$query = "SELECT TABLE_NAME, TABLE_COMMENT
-				  FROM INFORMATION_SCHEMA.TABLES
-				  WHERE TABLE_SCHEMA = :schema 
-				  ORDER BY TABLE_COMMENT, TABLE_NAME";
-		$params = array(':schema' => $name);
-
-		// Fetch results
-		$statement = $_DB->prepare($query);
-		$statement->execute($params);
-
-		return $statement->fetchAll(PDO::FETCH_ASSOC);
 	}
 }
 ?>

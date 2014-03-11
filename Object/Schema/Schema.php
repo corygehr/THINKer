@@ -9,7 +9,6 @@
 class THINKER_Object_Schema extends THINKER_Object
 {
 	private $schemaName;
-	private $Tables;
 
 	/**
 	 * __construct()
@@ -38,9 +37,8 @@ class THINKER_Object_Schema extends THINKER_Object
 
 		if($statement->fetchColumn(0) == 1)
 		{
-			// Load schema tables
+			// Load data into object
 			$this->schemaName = $schemaName;
-			$this->Tables = $this->fetchSchemaTables($schemaName);
 		}
 		else
 		{
@@ -135,53 +133,46 @@ class THINKER_Object_Schema extends THINKER_Object
 
 	/**
 	 * getSchemaTableNames()
-	 * Returns an array of all table names in the current schema
+	 * Returns a list of the tables in the selected schema
+	 * Cannot load locally, as this causes performance issues
 	 *
 	 * @access public
-	 * @return Array of Table Names (Format: Array(Table Name, Friendly Name))
+	 * @static
+	 * @param $schemaName: Schema Name
+	 * @return Array of Schema Tables (Format: Array(Table Name, Friendly Name))
 	 */
-	public function getSchemaTableNames()
+	public static function getSchemaTableNames($schemaName)
 	{
+		global $_DB;
+
+		$query = "SELECT TABLE_NAME, TABLE_COMMENT
+				  FROM INFORMATION_SCHEMA.TABLES
+				  WHERE TABLE_SCHEMA = :schemaName 
+				  ORDER BY TABLE_COMMENT, TABLE_NAME";
+		$params = array(':schemaName' => $schemaName);
+
+		// Fetch results
+		$statement = $_DB->prepare($query);
+		$statement->execute($params);
+		$results = $statement->fetchAll(PDO::FETCH_NUM);
+
 		$output = array();
 
-		// Names are contained in each index
-		foreach($this->Tables as $index => $Object)
+		if($results)
 		{
-			$output[] = array($index, $Object->getTableFriendlyName());
+			foreach($results as $t)
+			{
+				list($tableName, $tableComment) = $t;
+
+				if(!$tableComment)
+				{
+					$tableComment = $tableName;
+				}
+
+				$output[] = array($tableName, $tableComment);
+			}
 		}
 
 		return $output;
-	}
-
-	/**
-	 * getSchemaTables()
-	 * Returns an array of the tables contained in the current schema
-	 *
-	 * @access public
-	 * @return Array of THINKER_Object_Table Objects
-	 */
-	public function getSchemaTables()
-	{
-		return $this->Tables;
-	}
-
-	/**
-	 * getTable()
-	 * Returns a specific instance of a table object
-	 *
-	 * @access public
-	 * @param $tableName: Name of the Table
-	 * @return THINKER_Object_Table Object
-	 */
-	public function getTable($tableName)
-	{
-		if(isset($this->Tables[$tableName]))
-		{
-			return $this->Tables[$tableName];
-		}
-		else
-		{
-			return null;
-		}
 	}
 }
