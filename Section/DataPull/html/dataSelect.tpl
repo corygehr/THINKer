@@ -16,32 +16,45 @@
 	</ol>
 </div>
 <p>
-	Now, choose the data you'd like to pull from '<?php echo $this->get('schemaName', 'inline') . '.' . $this->get('tableName', 'inline'); ?>':
+	Now, choose the data you'd like to pull from <strong><?php echo $this->get('schemaName', 'inline') . ".'" . $this->get('tableName', 'inline') . "'"; ?></strong>:
 </p>
-<form id='dsSelect' method='post'>
+<form id='dsSelect' method='post' action='<?php echo createUrl('DataPull', 'filterSelect'); ?>'>
 	<fieldset>
 		<legend>Select Data Points</legend>
 		<div id='data-points'>
-			<ul>
-				<li><a href='#tabs-1'>Table 1</a></li>
-				<li><a href='#tabs-2'>Table 2</a></li>
-				<li><a href='#tabs-3'>Table 3</a></li>
-			</ul>
-			<div id='tabs-1'>
-				<p>
-					Table 1 Data checkboxes go here.
-				</p>
-			</div>
-			<div id='tabs-2'>
-				<p>
-					Table 2 Data checkboxes go here.
-				</p>
-			</div>
-			<div id='tabs-3'>
-				<p>
-					Table 3 Data checkboxes go here.
-				</p>
-			</div>
+<?php
+	// Get column data
+	$colData = $this->get('columns');
+
+	$titles = '';
+	$divs = '';
+
+	// Echo titles
+	for($i=0;$i<count($colData);$i++)
+	{
+		$curData = $colData[$i];
+
+		// First grab title
+		$titles .= "<li><a href='#tabs-$i'>" . $curData['TABLE_FRIENDLY'] . "</a></li>";
+
+		// Now generate checkboxes
+		$divs .= "<div id='tabs-$i'>";
+
+		// Loop through columns
+		foreach($curData['COLUMNS'] as $c)
+		{
+			list($colName, $friendlyName) = $c;
+			$chkId = $curData['SCHEMA'] . '-' . $curData['TABLE'] . '-' . $colName;
+			$divs .= "<input type='checkbox' id='$chkId' name='$chkId' /><label for='$chkId'>$friendlyName</label><br />";
+		}
+
+		// Close div
+		$divs .= "</div>";
+	}
+
+	echo "<ul>$titles</ul>";
+	echo $divs;
+?>
 		</div>
 		<input type='submit' value='Next >' />
 	</fieldset>

@@ -29,8 +29,50 @@ class THINKER_Section_DataPull extends THINKER_Section
 
 		if($schema && $table)
 		{
+			// Get table friendly name
+			$ParentTable = new THINKER_Object_Table($schema, $table);
+
 			$this->set('schemaName', $schema);
-			$this->set('tableName', $table);
+			$this->set('tableName', $ParentTable->getTableFriendlyName());
+
+			// Get the columns for this table, and those it has relationships to
+			$columns = array();
+
+			$columns[] = array(
+				'SCHEMA' => $schema,
+				'TABLE' => $table,
+				'TABLE_FRIENDLY' => $ParentTable->getTableFriendlyName(),
+				'COLUMNS' => THINKER_Object_Table::getTableColumnNames($schema, $table)
+				);
+
+			// Discover relationships
+			$relationTables = $ParentTable->discoverRelationships();
+
+			if($relationTables)
+			{
+				// Compile columns from relationship tables
+				foreach($relationTables as $t)
+				{
+					list($refSchema, $refTable, $refTableComment, $columnName, $columnComment, $refColumnName) = $t;
+
+					if(!$refTableComment)
+					{
+						$refTableComment = $refTable;
+					}
+
+					// Add FK Column Comment to Foreign Table
+					$refTableComment .= " ($columnComment)";
+
+					$columns[] = array(
+						'SCHEMA' => $refSchema,
+						'TABLE' => $refTable,
+						'TABLE_FRIENDLY' => $refTableComment,
+						'COLUMNS' => THINKER_Object_Table::getTableColumnNames($refSchema, $refTable)
+						);
+				}
+			}
+
+			$this->set('columns', $columns);
 		}
 		else
 		{

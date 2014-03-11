@@ -59,6 +59,52 @@ class THINKER_Object_Table extends THINKER_Object
 	}
 
 	/**
+	 * discoverRelationships()
+	 * Returns the name of each table this table has Foreign Key relationships with
+	 *
+	 * @access public
+	 * @return Array of Table Names (Format: Array(Foreign Schema, Foreign Table Name, Foreign Table Friendly Name, Key Column Name, Key Column Friendly Name, Referenced Column Name))
+	 */
+	public function discoverRelationships()
+	{
+		global $_DB;
+
+		$query = "SELECT KCU.COLUMN_NAME, C.COLUMN_COMMENT, KCU.REFERENCED_TABLE_SCHEMA, KCU.REFERENCED_TABLE_NAME, T.TABLE_COMMENT, 
+				  KCU.REFERENCED_COLUMN_NAME 
+				  FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE KCU 
+				  JOIN INFORMATION_SCHEMA.COLUMNS C 
+				  	ON C.TABLE_SCHEMA = KCU.TABLE_SCHEMA AND C.TABLE_NAME = KCU.TABLE_NAME AND C.COLUMN_NAME = KCU.COLUMN_NAME 
+				  JOIN INFORMATION_SCHEMA.TABLES T
+				  	ON T.TABLE_SCHEMA = KCU.TABLE_SCHEMA AND T.TABLE_NAME = KCU.REFERENCED_TABLE_NAME 
+				  WHERE KCU.TABLE_SCHEMA = :schemaName 
+				  AND KCU.TABLE_NAME = :tableName 
+				  AND KCU.REFERENCED_TABLE_NAME IS NOT NULL 
+				  ORDER BY KCU.COLUMN_NAME";
+		$params = array(':schemaName' => $this->getTableSchema(), ':tableName' => $this->getTableName());
+
+		$statement = $_DB->prepare($query);
+		$statement->execute($params);
+
+		$results = $statement->fetchAll(PDO::FETCH_NUM);
+
+		$output = array();
+
+		if($results)
+		{
+			foreach($results as $t)
+			{
+				list($columnName, $columnComment, $refSchema, $refTable, $refTableComment, $refColumnName) = $t;
+
+				$output[] = array(
+					$refSchema, $refTable, $refTableComment, $columnName, $columnComment, $refColumnName
+					);
+			}
+		}
+
+		return $output;
+	}
+
+	/**
 	 * fetchTableColumns()
 	 * Returns an array of the columns contained in the specified table
 	 *
@@ -104,9 +150,12 @@ class THINKER_Object_Table extends THINKER_Object
 	 * Returns an array of this table's column names
 	 *
 	 * @access public
+	 * @static
+	 * @param $schemaName: Schema Name
+	 * @param $tableName: Table Name
 	 * @return Array of Column Names
 	 */
-	public function getTableColumnNames()
+	public static function getTableColumnNames($schemaName, $tableName)
 	{
 		global $_DB;
 
@@ -114,8 +163,8 @@ class THINKER_Object_Table extends THINKER_Object
 				  FROM INFORMATION_SCHEMA.COLUMNS
 				  WHERE TABLE_SCHEMA = :schemaName 
 				  AND TABLE_NAME = :tableName 
-				  ORDER BY COLUMN_COMMENT, COLUMN_NAME";
-		$params = array(':schemaName' => $schemaName);
+				  ORDER BY ORDINAL_POSITION, COLUMN_COMMENT, COLUMN_NAME";
+		$params = array(':schemaName' => $schemaName, ':tableName' => $tableName);
 
 		// Fetch results
 		$statement = $_DB->prepare($query);
