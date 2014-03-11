@@ -26,6 +26,7 @@ class THINKER_Section_DataPull extends THINKER_Section
 
 			case 'proceed':
 				// Gather all possible column selections
+				redirect('DataPull', 'filterSelect');
 			break;
 		}
 
