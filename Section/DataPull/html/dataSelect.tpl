@@ -44,7 +44,7 @@
 		foreach($curData['COLUMNS'] as $c)
 		{
 			list($colName, $friendlyName) = $c;
-			$chkId = $curData['SCHEMA'] . '-' . $curData['TABLE'] . '-' . $colName;
+			$chkId = $curData['SCHEMA'] . '-|-' . $curData['TABLE'] . '-|-' . $colName;
 			$divs .= "<input type='checkbox' id='$chkId' name='$chkId' /><label for='$chkId'>$friendlyName</label><br />";
 		}
 

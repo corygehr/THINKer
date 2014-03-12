@@ -16,20 +16,6 @@ class THINKER_Section_DataPull extends THINKER_Section
 	 */
 	public function dataSelect()
 	{
-		$phase = getPageVar('phase', 'str', 'GET');
-
-		switch($phase)
-		{
-			case 'noCols':
-				pushMessage('Invalid or no columns selected!', 'error');
-			break;
-
-			case 'proceed':
-				// Gather all possible column selections
-				redirect('DataPull', 'filterSelect');
-			break;
-		}
-
 		// Check for schema information
 		$schema = $this->session->__get('PULL_SCHEMA');
 		$table = $this->session->__get('PULL_TABLE');
@@ -77,6 +63,63 @@ class THINKER_Section_DataPull extends THINKER_Section
 						'COLUMNS' => THINKER_Object_Table::getTableColumnNames($refSchema, $refTable)
 						);
 				}
+			}
+
+			// Now perform any actions specified, since we can use the columns to pull the selected fields
+			$phase = getPageVar('phase', 'str', 'GET');
+
+			switch($phase)
+			{
+				case 'noCols':
+					pushMessage('Invalid or no columns selected!', 'error');
+				break;
+
+				case 'proceed':
+					// Gather all possible column selections
+					// For each column, create the expected ID string and try to grab its value
+					$selectCols = array();
+
+					foreach($columns as $c)
+					{
+						$schemaName = $c['SCHEMA'];
+						$tableName = $c['TABLE'];
+						$tableFriendlyName = $c['TABLE_FRIENDLY'];
+						$cols = $c['COLUMNS'];
+
+						// Loop through cols
+						foreach($cols as $col)
+						{
+							list($colName, $colFriendlyName) = $col;
+							$id = $this->createColId($schemaName, $tableName, $colName);
+
+							// Pull data
+							$val = getPageVar($id, 'checkbox', 'POST', false);
+
+							if($val)
+							{
+								// Add to list of columns to pull
+								$selectCols[$id] = array(
+									'SCHEMA' => $schemaName,
+									'TABLE' => $tableName,
+									'COLUMN' => $colName,
+									'FRIENDLY_NAME' => $colFriendlyName
+									);
+							}
+						}
+					}
+
+					if(!empty($selectCols))
+					{
+						// Add to session and redirect
+						$this->session->__set('PULL_COLUMNS', $selectCols);
+						redirect('DataPull', 'filterSelect');
+					}
+					else
+					{
+						// Try again
+						redirect('DataPull', 'dataSelect', array('phase' => 'noCols'));
+					}
+				break;
 			}
 
 			$this->set('columns', $columns);
@@ -158,29 +201,141 @@ class THINKER_Section_DataPull extends THINKER_Section
 	 */
 	public function filterSelect()
 	{
-		$phase = getPageVar('phase', 'str', 'GET');
-
-		switch($phase)
-		{
-			case 'proceed':
-
-			break;
-		}
-
 		// Check for schema information
 		$schema = $this->session->__get('PULL_SCHEMA');
 		$table = $this->session->__get('PULL_TABLE');
 
 		if($schema && $table)
 		{
-			// Get table friendly name
-			$ParentTable = new THINKER_Object_Table($schema, $table);
+			// Get columns
+			$columns = $this->session->__get('PULL_COLUMNS');
 
-			$this->set('schemaName', $schema);
-			$this->set('tableName', $ParentTable->getTableFriendlyName());
+			if($columns)
+			{
+				// Process changes
+				$phase = getPageVar('phase', 'str', 'GET');
+
+				switch($phase)
+				{
+					case 'fetchFilterTypes':
+						// Get the name of the column
+						$column = getPageVar('column', 'str', 'GET');
+
+						if($column)
+						{
+							// Parse column provided
+							$colParts = explode('-|-', $column);
+
+							// Needs to be three parts
+							if(count($colParts) === 3)
+							{
+								// Get the column data type
+								$Column = new THINKER_Object_Column($colParts[0], $colParts[1], $colParts[2]);
+
+								if(!empty($Column))
+								{
+									$colType = $Column->getColumnType();
+
+									$filters = array();
+
+									switch($colType)
+									{
+										case 'bigint':
+										case 'decimal':
+										case 'double':
+										case 'float':
+										case 'int':
+										case 'smallint':
+											$filters = array(
+												'EQUALS' => '=',
+												'GT' => '>',
+												'GTE' => '>=',
+												'LT' => '<',
+												'LTE' => '<='
+												);
+										break;
+
+										case 'date':
+										case 'datetime':
+										case 'time':
+										case 'timestamp':
+											$filters = array(
+												'BEFORE' => 'Before',
+												'BEFORE_INCL' => 'Before (Inclusive)',
+												'AFTER' => 'After',
+												'AFTER_INCL' => 'After (Inclusive)',
+												'EQUALS' => 'Equals'
+												);
+										break;
+
+										case 'tinyint':
+											$filters = array(
+												'FALSE' => 'False',
+												'TRUE' => 'True'
+												);
+										break;
+
+										default:
+											// Varchar, Char, Enum Typically
+											$filters = array(
+												'CONTAINS' => 'Contains',
+												'EQUALS' => 'Equals',
+												'LIKE' => 'Like',
+												'STARTS_WITH' => 'Starts With',
+												'ENDS_WITH' => 'Ends With'
+												);
+										break;
+									}
+
+									$this->set('filters', $filters);
+								}
+							}
+						}
+
+						// This is all we need here
+						return true;
+					break;
+
+					case 'proceed':
+
+					break;
+				}
+
+				// Get table friendly name
+				$ParentTable = new THINKER_Object_Table($schema, $table);
+
+				$this->set('schemaName', $schema);
+				$this->set('tableName', $ParentTable->getTableFriendlyName());
+				$this->set('columns', $columns);
+			}
+			else
+			{
+				// We have a schema and table, but no columns. Redirect back to dataSelect
+				redirect('DataPull', 'dataSelect', array('phase' => 'noCols'));
+			}
+		}
+		else
+		{
+			// User hasn't started yet. Redirect to start
+			redirect('DataPull', 'dsSelect', array('phase' => 'noSchema'));
 		}
 
 		return true;
+	}
+
+	/**
+	 * createColId()
+	 * Returns the HTML 'id' for a column
+	 *
+	 * @access private
+	 * @param $schema: Schema Name
+	 * @param $table: Table Name
+	 * @param $column: Column Name
+	 * @return Column ID
+	 */
+	private function createColId($schema, $table, $column)
+	{
+		return $schema . '-|-' . $table . '-|-' . $column;
 	}
 }
 ?>

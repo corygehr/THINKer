@@ -70,7 +70,7 @@ class THINKER_Object_Table extends THINKER_Object
 		global $_DB;
 
 		$query = "SELECT KCU.COLUMN_NAME, C.COLUMN_COMMENT, KCU.REFERENCED_TABLE_SCHEMA, KCU.REFERENCED_TABLE_NAME, T.TABLE_COMMENT, 
-				  KCU.REFERENCED_COLUMN_NAME 
+				  KCU.REFERENCED_COLUMN_NAME, 
 				  FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE KCU 
 				  JOIN INFORMATION_SCHEMA.COLUMNS C 
 				  	ON C.TABLE_SCHEMA = KCU.TABLE_SCHEMA AND C.TABLE_NAME = KCU.TABLE_NAME AND C.COLUMN_NAME = KCU.COLUMN_NAME 
@@ -153,13 +153,13 @@ class THINKER_Object_Table extends THINKER_Object
 	 * @static
 	 * @param $schemaName: Schema Name
 	 * @param $tableName: Table Name
-	 * @return Array of Column Names
+	 * @return Array of Column Names (Name, Friendly Name)
 	 */
 	public static function getTableColumnNames($schemaName, $tableName)
 	{
 		global $_DB;
 
-		$query = "SELECT COLUMN_NAME, COLUMN_COMMENT
+		$query = "SELECT COLUMN_NAME, COLUMN_COMMENT 
 				  FROM INFORMATION_SCHEMA.COLUMNS
 				  WHERE TABLE_SCHEMA = :schemaName 
 				  AND TABLE_NAME = :tableName 

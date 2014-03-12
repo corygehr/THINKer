@@ -21,6 +21,27 @@
 <form id='filterSelect' method='post' action='<?php echo createUrl('DataPull', 'filterSelect'); ?>'>
 	<fieldset>
 		<legend>Select Filters</legend>
+		<select id='filter_1' class='colFilter' name='filter_1' onchange=''>
+			<option>Choose a Data Point:</option>
+<?php
+	// Get columns and create options for them
+	$options = $this->get('columns');
+
+	if($options)
+	{
+		foreach($options as $o => $val)
+		{
+			$friendlyName = $val['FRIENDLY_NAME'];
+			echo "<option value='$o'>$friendlyName</option>";
+		}
+	}
+?>
+		</select>
+		<select id='filter_option_1' name='filter_option_1' disabled>
+			<option>Filter Type:</option>
+		</select>
+		<input type='text' id='filter_value_1' name='filter_value_1' placeholder='Filter Value' />
+		<br />
 		<input type='submit' value='Next >' />
 	</fieldset>
 </form>

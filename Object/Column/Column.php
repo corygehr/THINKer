@@ -12,6 +12,7 @@ class THINKER_Object_Column extends THINKER_Object
 	private $columnDefault;
 	private $columnNullable;
 	private $columnType;
+	private $columnFullType;
 	private $columnMaxLength;
 	private $columnComment;
 	private $columnTable;
@@ -35,7 +36,7 @@ class THINKER_Object_Column extends THINKER_Object
 		parent::__construct();
 
 		// Query for Table Existence
-		$query = "SELECT COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE, 
+		$query = "SELECT COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE, COLUMN_TYPE, 
 				  CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION, 
 				  COLUMN_COMMENT
 				  FROM INFORMATION_SCHEMA.COLUMNS 
@@ -69,6 +70,7 @@ class THINKER_Object_Column extends THINKER_Object
 			}
 
 			$this->columnType = $result['DATA_TYPE'];
+			$this->columnFullType = $result['COLUMN_TYPE'];
 
 			if($result['CHARACTER_MAXIMUM_LENGTH'])
 			{
@@ -133,6 +135,18 @@ class THINKER_Object_Column extends THINKER_Object
 		{
 			return $this->columnName;
 		}
+	}
+
+	/**
+	 * getColumnFullType()
+	 * Returns the full data type of the current column
+	 *
+	 * @access public
+	 * @return Column Full Type
+	 */
+	public function getColumnFullType()
+	{
+		return $this->columnFullType;
 	}
 
 	/**
