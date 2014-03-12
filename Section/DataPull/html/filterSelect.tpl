@@ -31,7 +31,9 @@
 	{
 		foreach($options as $o => $val)
 		{
-			$friendlyName = $val['FRIENDLY_NAME'];
+			$tableFriendly = $val['TABLE_FRIENDLY'];
+			$friendlyName = "[$tableFriendly] " . $val['FRIENDLY_NAME'];
+
 			echo "<option value='$o'>$friendlyName</option>";
 		}
 	}

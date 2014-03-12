@@ -101,6 +101,7 @@ class THINKER_Section_DataPull extends THINKER_Section
 								$selectCols[$id] = array(
 									'SCHEMA' => $schemaName,
 									'TABLE' => $tableName,
+									'TABLE_FRIENDLY' => $tableFriendlyName,
 									'COLUMN' => $colName,
 									'FRIENDLY_NAME' => $colFriendlyName
 									);
