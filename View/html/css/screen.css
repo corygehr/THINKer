@@ -25,6 +25,11 @@ ul li {
 	list-style-type: square;
 }
 
+img.clickable {
+	cursor: pointer;
+	vertical-align: middle;
+}
+
 input,
 select,
 textarea {

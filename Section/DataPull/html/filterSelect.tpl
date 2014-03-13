@@ -21,8 +21,9 @@
 <form id='filterSelect' method='post' action='<?php echo createUrl('DataPull', 'filterSelect'); ?>'>
 	<fieldset>
 		<legend>Select Filters</legend>
-		<select id='filter_1' class='colFilter' name='filter_1' onchange=''>
-			<option>Choose a Data Point:</option>
+		<div id='1'>
+			<select id='filter-col_1' class='colFilter' name='filter_1' onchange=''>
+				<option>Choose a Data Point:</option>
 <?php
 	// Get columns and create options for them
 	$options = $this->get('columns');
@@ -38,14 +39,14 @@
 		}
 	}
 ?>
-		</select>
-		<select id='filter_option_1' name='filter_option_1' disabled>
-			<option>Filter Type:</option>
-		</select>
-		<input type='text' id='filter_value_1' name='filter_value_1' placeholder='Filter Value' />
-		<br />
+			</select>
+			<select id='filter-option_1' name='filter-option_1' disabled>
+				<option>Filter Type:</option>
+			</select>
+			<input type='text' id='filter-value_1' name='filter-value_1' placeholder='Filter Value' />
+			<img id='addButton' class='add clickable' src='View/html/images/add.png' width='20' height='20' /> 
+		</div>
 		<input type='submit' value='Next >' />
 	</fieldset>
 </form>
-
 <script type='text/javascript' src='Section/DataPull/html/filterSelect.js'></script>
