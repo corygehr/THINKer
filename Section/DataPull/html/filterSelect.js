@@ -12,12 +12,27 @@ $('#filterSelect').on('click', '.add', function() {
 	//divToCopy.appendTo($('div#'+num));
 
 	$(newDivId).children().each(function() {
-		if($(this).is("input") || $(this).is("select"))
+		if($(this).is("input"))
 		{
 			var inputName = $(this).attr('id').split('_')[0];
 			var newName = inputName+'_'+newNum;
 			$(this).attr('id', newName);
 			$(this).attr('name', newName);
+			$(this).val('');
+		}
+		else if($(this).is("select"))
+		{
+			var inputName = $(this).attr('id').split('_')[0];
+			var newName = inputName+'_'+newNum;
+			$(this).attr('id', newName);
+			$(this).attr('name', newName);
+
+			// Re-disable the filter option box
+			if(inputName === 'filter-option')
+			{
+				$(this).attr('disabled', true);
+				$(this).html('<option>Filter Type:</option>');
+			}
 		}
 	});
 
