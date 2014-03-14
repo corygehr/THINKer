@@ -18,11 +18,11 @@
 <p>
 	Add filters to constrain the data from <strong><?php echo $this->get('schemaName', 'inline') . ".'" . $this->get('tableName', 'inline') . "'"; ?></strong>:
 </p>
-<form id='filterSelect' method='post' action='<?php echo createUrl('DataPull', 'filterSelect'); ?>'>
+<form id='filterSelect' method='post' action='<?php echo createUrl('DataPull', 'filterSelect', array('phase' => 'proceed')); ?>'>
 	<fieldset>
 		<legend>Select Filters</legend>
 		<div id='1'>
-			<select id='filter-col_1' class='colFilter' name='filter_1' onchange=''>
+			<select id='filter-col_1' class='colFilter' name='filter-col_1'>
 				<option>Choose a Data Point:</option>
 <?php
 	// Get columns and create options for them

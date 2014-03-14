@@ -9,6 +9,69 @@
 class THINKER_Section_DataPull extends THINKER_Section
 {
 	/**
+	 * dataReview()
+	 * Passes data back for the 'dataReview' subsection
+	 *
+	 * @access public
+	 */
+	public function dataReview()
+	{
+		// Check for schema information
+		$schema = $this->session->__get('PULL_SCHEMA');
+		$table = $this->session->__get('PULL_TABLE');
+
+		if($schema && $table)
+		{
+			// Get columns
+			$columns = $this->session->__get('PULL_COLUMNS');
+
+			if($columns)
+			{
+				// Get filters
+				$filters = $this->session->__get('PULL_FILTERS');
+				var_dump($columns);
+				if(isset($filters))
+				{
+					// Generate DataSet
+					$DataSet = new THINKER_Object_DataSet($schema, $table, $columns, $filters);
+
+					// Get the data
+					$data = $DataSet->getData();
+
+					// Process phase
+					$phase = getPageVar('phase', 'str', 'GET', false);
+
+					switch($phase)
+					{
+						case 'export':
+
+						break;
+					}
+
+					// Pass back the data
+					$this->set('data', $data);
+				}
+				else
+				{
+					redirect('DataPull', 'filterSelect', array('phase' => 'noFilters'));	
+				}
+			}
+			else
+			{
+				// We have a schema and table, but no columns. Redirect back to dataSelect
+				redirect('DataPull', 'dataSelect', array('phase' => 'noCols'));
+			}
+		}
+		else
+		{
+			// User hasn't started yet. Redirect to start
+			redirect('DataPull', 'dsSelect', array('phase' => 'noSchema'));
+		}
+
+		return true;
+	}
+
+	/**
 	 * dataSelect()
 	 * Passes data back for the 'dataSelect' subsection
 	 *
@@ -35,7 +98,8 @@ class THINKER_Section_DataPull extends THINKER_Section
 				'SCHEMA' => $schema,
 				'TABLE' => $table,
 				'TABLE_FRIENDLY' => $ParentTable->getTableFriendlyName(),
-				'COLUMNS' => THINKER_Object_Table::getTableColumnNames($schema, $table)
+				'COLUMNS' => THINKER_Object_Table::getTableColumnNames($schema, $table),
+				'REF_COLUMN' => null
 				);
 
 			// Discover relationships
@@ -60,7 +124,8 @@ class THINKER_Section_DataPull extends THINKER_Section
 						'SCHEMA' => $refSchema,
 						'TABLE' => $refTable,
 						'TABLE_FRIENDLY' => $refTableComment,
-						'COLUMNS' => THINKER_Object_Table::getTableColumnNames($refSchema, $refTable)
+						'COLUMNS' => THINKER_Object_Table::getTableColumnNames($refSchema, $refTable),
+						'REF_COLUMN' => $refColumnName
 						);
 				}
 			}
@@ -71,7 +136,7 @@ class THINKER_Section_DataPull extends THINKER_Section
 			switch($phase)
 			{
 				case 'noCols':
-					pushMessage('Invalid or no columns selected!', 'error');
+					pushMessage('Invalid or no columns selected!', 'warning');
 				break;
 
 				case 'proceed':
@@ -85,6 +150,7 @@ class THINKER_Section_DataPull extends THINKER_Section
 						$tableName = $c['TABLE'];
 						$tableFriendlyName = $c['TABLE_FRIENDLY'];
 						$cols = $c['COLUMNS'];
+						$refCol = $c['REF_COLUMN'];
 
 						// Loop through cols
 						foreach($cols as $col)
@@ -103,7 +169,8 @@ class THINKER_Section_DataPull extends THINKER_Section
 									'TABLE' => $tableName,
 									'TABLE_FRIENDLY' => $tableFriendlyName,
 									'COLUMN' => $colName,
-									'FRIENDLY_NAME' => $colFriendlyName
+									'FRIENDLY_NAME' => $colFriendlyName,
+									'REF_COLUMN' => $refCol
 									);
 							}
 						}
@@ -159,11 +226,11 @@ class THINKER_Section_DataPull extends THINKER_Section
 			break;
 
 			case 'invalidCombo':
-				pushMessage('An invalid schema/table combination was selected, please try again.', 'error');
+				pushMessage('An invalid schema/table combination was selected, please try again.', 'warning');
 			break;
 
 			case 'noSchema':
-				pushMessage('An invalid schema was selected, please try again.', 'error');
+				pushMessage('An invalid schema was selected, please try again.', 'warning');
 			break;
 
 			case 'proceed':
@@ -298,7 +365,62 @@ class THINKER_Section_DataPull extends THINKER_Section
 					break;
 
 					case 'proceed':
+						// Get inputs, as long as they're provided
+						$filters = array();
+						$process = true;
+						$count = 1;
 
+						while($process)
+						{
+							$filterAndOrName = "filter-andor_$count";
+							$filterColName = "filter-col_$count";
+							$filterOptionName = "filter-option_$count";
+							$filterValueName = "filter-value_$count";
+
+							$column = getPageVar($filterColName, 'str', 'POST', false);
+
+							if(!empty($column))
+							{
+								// Get the option, andor, and values
+								$option = getPageVar($filterOptionName, 'str', 'POST', false);
+								$value = getPageVar($filterValueName, 'str', 'POST', false);
+								$andOr = getPageVar($filterAndOrName, 'str', 'POST', false);
+
+								if($option && $value)
+								{
+									// If no AndOr, then assume AND
+									if(!$andOr && $count == 1)
+									{
+										$andOr = 'FIRST';
+									}
+									else
+									{
+										$andOr = 'AND';
+									}
+
+									// Store values in array
+									$filters[] = array('COLUMN' => $column, 'OPTION' => $option, 'VALUE' => $value, 'ANDOR' => $andOr);
+
+									// Continue
+									$count++;
+								}
+								else
+								{
+									// Throw error
+									redirect('DataPull', 'filterSelect', array('phase' => 'missingInfo'));
+								}
+							}
+							else
+							{
+								// No column value, so we're done
+								$process = false;
+							}
+						}
+
+						// Store filters in session and redirect
+						$this->session->__set('PULL_FILTERS', $filters);
+
+						redirect('DataPull', 'dataReview');
 					break;
 				}
 
