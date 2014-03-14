@@ -75,7 +75,7 @@ class THINKER_Object_DataSet extends THINKER_Object
 
 			// Initialize arrays to store database table info
 			$schemas = array($this->primarySchema);
-			$tables = array(0 => array($this->primaryTable));
+			$tables = array(0 => array($this->primaryTable, null)); // Index 0 has table name, 1 has col name
 			$columns = array();
 
 			// Keep a count of the number of tables (aids with refs)
@@ -86,7 +86,7 @@ class THINKER_Object_DataSet extends THINKER_Object
 				$colSchema = $col['SCHEMA'];
 				$colTable = $col['TABLE'];
 				$colName = $col['COLUMN'];
-				$refColName = $col['REF_COL'];
+				$refColName = $col['REF_COLUMN'];
 
 				// Primary Schema & table are always 0
 				$schemaRef = 0;
@@ -119,13 +119,12 @@ class THINKER_Object_DataSet extends THINKER_Object
 						{
 							// Increment table count
 							$tableCount++;
-							// Add to schemas array
-							$tables[$schemaRef][$tableCount] = $colTable;
+							// Add to tables array
+							$tables[$schemaRef][$tableCount] = array($colTable, $refColName);
 							$tableRef = $tableCount;
 						}
 					}
 				}
-
 
 				// Add column to return
 				if($selectCols)
@@ -133,19 +132,22 @@ class THINKER_Object_DataSet extends THINKER_Object
 					$selectCols .= ',';
 				}
 
-				$selectCols .= " $tableRef.$colName"
+				$selectCols .= " $tableRef.$colName";
 			}
 
 			// Create JOINs
-			for($i=0; $i<count($schema); $i++)
+			for($i=0; $i<count($schemas); $i++)
 			{
-				if($i == 0)
+				foreach($tables as $j => $val)
 				{
-
-				}
-				else
-				{
-
+					if($i == 0)
+					{
+						$from = "FROM " . $this->primarySchema . ".$val $j";
+					}
+					else
+					{
+						$from .= " JOIN " . $schemas[$i] . "." . $tables[$i][$j] . " $j ON ";
+					}
 				}
 			}
 

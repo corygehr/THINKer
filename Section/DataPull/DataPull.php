@@ -103,12 +103,12 @@ class THINKER_Section_DataPull extends THINKER_Section
 				);
 
 			// Discover relationships
-			$relationTables = $ParentTable->discoverRelationships();
+			$relationships = $ParentTable->discoverRelationships();
 
-			if($relationTables)
+			if($relationships)
 			{
 				// Compile columns from relationship tables
-				foreach($relationTables as $t)
+				foreach($relationships as $t)
 				{
 					list($refSchema, $refTable, $refTableComment, $columnName, $columnComment, $refColumnName) = $t;
 

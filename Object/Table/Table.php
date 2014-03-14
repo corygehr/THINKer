@@ -60,22 +60,24 @@ class THINKER_Object_Table extends THINKER_Object
 
 	/**
 	 * discoverRelationships()
-	 * Returns the name of each table this table has Foreign Key relationships with
+	 * Returns the information about each Foreign Key relationship with other tables
 	 *
 	 * @access public
-	 * @return Array of Table Names (Format: Array(Foreign Schema, Foreign Table Name, Foreign Table Friendly Name, Key Column Name, Key Column Friendly Name, Referenced Column Name))
+	 * @return Array of THINKER_Object_Relationship Objects
 	 */
 	public function discoverRelationships()
 	{
 		global $_DB;
 
-		$query = "SELECT KCU.COLUMN_NAME, C.COLUMN_COMMENT, KCU.REFERENCED_TABLE_SCHEMA, KCU.REFERENCED_TABLE_NAME, T.TABLE_COMMENT, 
-				  KCU.REFERENCED_COLUMN_NAME 
+		$query = "SELECT KCU.CONSTRAINT_NAME, KCU.COLUMN_NAME, C.COLUMN_COMMENT, KCU.REFERENCED_TABLE_SCHEMA, KCU.REFERENCED_TABLE_NAME, 
+				  T.TABLE_COMMENT, KCU.REFERENCED_COLUMN_NAME, C1.COLUMN_COMMENT
 				  FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE KCU 
 				  JOIN INFORMATION_SCHEMA.COLUMNS C 
 				  	ON C.TABLE_SCHEMA = KCU.TABLE_SCHEMA AND C.TABLE_NAME = KCU.TABLE_NAME AND C.COLUMN_NAME = KCU.COLUMN_NAME 
+				  JOIN INFORMATION_SCHEMA.COLUMNS C1
+				    ON C1.TABLE_SCHEMA = KCU.REFERENCED_TABLE_SCHEMA AND C1.TABLE_NAME = KCU.REFERENCED_TABLE_NAME AND C1.COLUMN_NAME = KCU.REFERENCED_COLUMN_NAME 
 				  JOIN INFORMATION_SCHEMA.TABLES T
-				  	ON T.TABLE_SCHEMA = KCU.TABLE_SCHEMA AND T.TABLE_NAME = KCU.REFERENCED_TABLE_NAME 
+				  	ON T.TABLE_SCHEMA = KCU.REFERENCED_TABLE_SCHEMA AND T.TABLE_NAME = KCU.REFERENCED_TABLE_NAME 
 				  WHERE KCU.TABLE_SCHEMA = :schemaName 
 				  AND KCU.TABLE_NAME = :tableName 
 				  AND KCU.REFERENCED_TABLE_NAME IS NOT NULL 
@@ -93,11 +95,10 @@ class THINKER_Object_Table extends THINKER_Object
 		{
 			foreach($results as $t)
 			{
-				list($columnName, $columnComment, $refSchema, $refTable, $refTableComment, $refColumnName) = $t;
+				list($relationName, $columnName, $columnComment, $refSchema, $refTable, $refTableComment, $refColumnName, $refColumnComment) = $t;
 
-				$output[] = array(
-					$refSchema, $refTable, $refTableComment, $columnName, $columnComment, $refColumnName
-					);
+				$output[] = THINKER_Object_Relationship::createFromParams($relationName, $this->getTableSchema(), $this->getTableName(), $this->getTableFriendlyName(), 
+					$columnName, $columnComment, $refSchema, $refTable, $refTableComment, $refColumnName, $refColumnComment);
 			}
 		}
 
