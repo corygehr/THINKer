@@ -29,11 +29,11 @@ class THINKER_Section_DataPull extends THINKER_Section
 			{
 				// Get filters
 				$filters = $this->session->__get('PULL_FILTERS');
-
+				
 				if(isset($filters))
 				{
 					// Generate DataSet
-					$DataSet = new THINKER_Object_DataSet($schema, $table, $columns, $filters);
+					$DataSet = new THINKER_Object_DataSet($Schema, $Table, $columns, $filters);
 
 					// Get the data
 					$data = $DataSet->getData();
@@ -279,16 +279,25 @@ class THINKER_Section_DataPull extends THINKER_Section
 						{
 							// Parse column provided
 							$colParts = explode('-|-', $column);
+							$colPartCount = count($colParts);
 
 							// Needs to be three or four parts
-							if(count($colParts) === 3 || count($colParts) === 4)
+							if($colPartCount === 3 || $colPartCount === 4)
 							{
-								// Get the column data type
-								$Column = THINKER_Object_Column::createFromDB($colParts[0], $colParts[1], $colParts[2]);
+								$fkCol = null;
 
-								if(!empty($Column))
+								if($colPartCount === 4)
 								{
-									$colType = $Column->getColumnType();
+									$fkCol = $colParts[3];
+								}
+
+								// Get the column data type
+								$id = $this->createColId($colParts[0], $colParts[1], $colParts[2], $fkCol);
+
+								if(isset($columns[$id]))
+								{
+									$Column = $columns[$id];
+									$colType = $Column['COLUMN']->getColumnType();
 
 									$filters = array();
 
@@ -350,6 +359,14 @@ class THINKER_Section_DataPull extends THINKER_Section
 						return true;
 					break;
 
+					case 'invalidColumn':
+						pushMessage('An invalid column was specified, please try again.', 'warning');
+					break;
+
+					case 'missingInfo':
+						pushMessage('A required filter option and/or value were missing, please try again.', 'warning');
+					break;
+
 					case 'proceed':
 						// Get inputs, as long as they're provided
 						$filters = array();
@@ -367,33 +384,44 @@ class THINKER_Section_DataPull extends THINKER_Section
 
 							if(!empty($column))
 							{
-								// Get the option, andor, and values
-								$option = getPageVar($filterOptionName, 'str', 'POST', false);
-								$value = getPageVar($filterValueName, 'str', 'POST', false);
-								$andOr = getPageVar($filterAndOrName, 'str', 'POST', false);
-
-								if($option && $value)
+								// Get Column Object
+								if(isset($columns[$column]))
 								{
-									// If no AndOr, then assume AND
-									if(!$andOr && $count == 1)
+									$FilterCol = $columns[$column];
+
+									// Get the option, andor, and values
+									$option = getPageVar($filterOptionName, 'str', 'POST', false);
+									$value = getPageVar($filterValueName, 'str', 'POST', false);
+									$andOr = getPageVar($filterAndOrName, 'str', 'POST', false);
+
+									if($option && $value)
 									{
-										$andOr = 'FIRST';
+										// If no AndOr, then assume AND
+										if(!$andOr && $count == 1)
+										{
+											$andOr = 'FIRST';
+										}
+										else
+										{
+											$andOr = 'AND';
+										}
+
+										// Store values in array
+										$filters[] = array('COLUMN' => $FilterCol, 'OPTION' => $option, 'VALUE' => $value, 'ANDOR' => $andOr);
+
+										// Continue
+										$count++;
 									}
 									else
 									{
-										$andOr = 'AND';
+										// Throw error
+										redirect('DataPull', 'filterSelect', array('phase' => 'missingInfo'));
 									}
-
-									// Store values in array
-									$filters[] = array('COLUMN' => $column, 'OPTION' => $option, 'VALUE' => $value, 'ANDOR' => $andOr);
-
-									// Continue
-									$count++;
 								}
 								else
 								{
 									// Throw error
-									redirect('DataPull', 'filterSelect', array('phase' => 'missingInfo'));
+									redirect('DataPull', 'filterSelect', array('phase' => 'invalidColumn'));
 								}
 							}
 							else

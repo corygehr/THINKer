@@ -10,8 +10,8 @@ class THINKER_Object_DataSet extends THINKER_Object
 {
 	private $columns;
 	private $filters;
-	private $primarySchema;
-	private $primaryTable;
+	private $PrimarySchema;
+	private $PrimaryTable;
 	private $query;
 	private $queryParams;
 	private $returnedData;
@@ -22,12 +22,12 @@ class THINKER_Object_DataSet extends THINKER_Object
 	 *
 	 * @author Cory Gehr
 	 * @access public
-	 * @param $schema: Primary Schema
-	 * @param $table: Primary Table
+	 * @param $Schema: Primary Schema Object
+	 * @param $Table: Primary Table Object
 	 * @param $columns: Columns to pull
 	 * @param $filters: Filters to use (default: empty array)
 	 */
-	public function __construct($schema, $table, $columns, $filters = array())
+	public function __construct($Schema, $Table, $columns, $filters = array())
 	{
 		global $_DB;
 
@@ -37,8 +37,8 @@ class THINKER_Object_DataSet extends THINKER_Object
 		// Set local variables
 		$this->columns = $columns;
 		$this->filters = $filters;
-		$this->primarySchema = $schema;
-		$this->primaryTable = $table;
+		$this->PrimarySchema = $Schema;
+		$this->PrimaryTable = $Table;
 
 		// Pull data
 		$this->compileQuery();
@@ -64,98 +64,7 @@ class THINKER_Object_DataSet extends THINKER_Object
 	{
 		if($this->columns && isset($this->filters))
 		{
-			// Start parsing query
-			$selectCols = "";
-			// FROM string
-			$from = "";
-			// WHERE, if necessary
-			$where = "";
-			// Query parameters
-			$params = array();
-
-			// Initialize arrays to store database table info
-			$schemas = array($this->primarySchema);
-			$tables = array(0 => array($this->primaryTable, null)); // Index 0 has table name, 1 has col name
-			$columns = array();
-
-			// Keep a count of the number of tables (aids with refs)
-			$tableCount = 0; // Start at 0 for the primary table -- we increment before we add a new one
-
-			foreach($this->columns as $col)
-			{
-				$colSchema = $col['SCHEMA'];
-				$colTable = $col['TABLE'];
-				$colName = $col['COLUMN'];
-				$refColName = $col['REF_COLUMN'];
-
-				// Primary Schema & table are always 0
-				$schemaRef = 0;
-				$tableRef = 0;
-
-				// Schema & Table Check
-				if($colSchema != $this->primarySchema)
-				{
-					// Check for schema in array
-					$schemaRef = array_search($colSchema, $schemas);
-
-					if(!$schemaRef)
-					{
-						// Add to schemas array
-						$schemas[] = $colSchema;
-						// Get index by looking at the last item in the array
-						$schemaRef = end($schemas);
-					}
-
-					// We have a schema reference, so now see if the table has already gotten a reference
-
-					// Check for table
-					if($colTable != $this->primaryTable)
-					{
-						// Check for table reference
-						$tableRef = array_search($colTable, $tables[$schemaRef]);
-
-						// If no reference exists, add one
-						if(!$tableRef)
-						{
-							// Increment table count
-							$tableCount++;
-							// Add to tables array
-							$tables[$schemaRef][$tableCount] = array($colTable, $refColName);
-							$tableRef = $tableCount;
-						}
-					}
-				}
-
-				// Add column to return
-				if($selectCols)
-				{
-					$selectCols .= ',';
-				}
-
-				$selectCols .= " $tableRef.$colName";
-			}
-
-			// Create JOINs
-			for($i=0; $i<count($schemas); $i++)
-			{
-				foreach($tables as $j => $val)
-				{
-					if($i == 0)
-					{
-						$from = "FROM " . $this->primarySchema . ".$val $j";
-					}
-					else
-					{
-						$from .= " JOIN " . $schemas[$i] . "." . $tables[$i][$j] . " $j ON ";
-					}
-				}
-			}
-
-			// Assign final values to local variables
-			$this->query = "SELECT $selectCols $from $where";
-			$this->queryParams = $params;
-
-			return true;
+			
 		}
 		else
 		{
