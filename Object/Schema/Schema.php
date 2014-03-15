@@ -65,7 +65,7 @@ class THINKER_Object_Schema extends THINKER_Object
 		$Object = new THINKER_Object_Schema();
 
 		// Set values
-		$this->schemaName = $schemaName;
+		$Object->schemaName = $schemaName;
 
 		return $Object;
 	}

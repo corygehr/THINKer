@@ -17,10 +17,10 @@ class THINKER_Section_DataPull extends THINKER_Section
 	public function dataReview()
 	{
 		// Check for schema information
-		$schema = $this->session->__get('PULL_SCHEMA');
-		$table = $this->session->__get('PULL_TABLE');
+		$Schema = $this->session->__get('PULL_SCHEMA');
+		$Table = $this->session->__get('PULL_TABLE');
 
-		if($schema && $table)
+		if(!empty($Schema) && !empty($Table))
 		{
 			// Get columns
 			$columns = $this->session->__get('PULL_COLUMNS');
@@ -29,7 +29,7 @@ class THINKER_Section_DataPull extends THINKER_Section
 			{
 				// Get filters
 				$filters = $this->session->__get('PULL_FILTERS');
-				
+
 				if(isset($filters))
 				{
 					// Generate DataSet
@@ -80,30 +80,27 @@ class THINKER_Section_DataPull extends THINKER_Section
 	public function dataSelect()
 	{
 		// Check for schema information
-		$schema = $this->session->__get('PULL_SCHEMA');
-		$table = $this->session->__get('PULL_TABLE');
+		$Schema = $this->session->__get('PULL_SCHEMA');
+		$Table = $this->session->__get('PULL_TABLE');
 
-		if($schema && $table)
+		if(!empty($Schema) && !empty($Table))
 		{
-			// Get table friendly name
-			$ParentTable = THINKER_Object_Table::createFromDB($schema, $table);
-
-			$this->set('schemaName', $schema);
-			$this->set('tableName', $ParentTable->getTableFriendlyName());
+			$this->set('schemaName', $Schema->getSchemaName());
+			$this->set('tableName', $Table->getTableFriendlyName());
 
 			// Get the columns for this table, and those it has relationships to
 			$columns = array();
 
 			$columns[] = array(
-				'SCHEMA' => $schema,
-				'TABLE' => $table,
-				'TABLE_FRIENDLY' => $ParentTable->getTableFriendlyName(),
-				'COLUMNS' => THINKER_Object_Table::getTableColumnNames($schema, $table),
+				'SCHEMA' => $Schema,
+				'TABLE' => $Table->getTableName(),
+				'TABLE_FRIENDLY' => $Table->getTableFriendlyName(),
+				'COLUMNS' => THINKER_Object_Table::getTableColumnNames($Schema->getSchemaName(), $Table->getTableName()),
 				'REF_COLUMN' => null
 				);
 
 			// Discover relationships
-			$relationships = $ParentTable->discoverRelationships();
+			$relationships = $Table->discoverRelationships();
 
 			if($relationships)
 			{
@@ -231,12 +228,12 @@ class THINKER_Section_DataPull extends THINKER_Section
 				$schema = getPageVar('schema', 'str', 'POST', true);
 				$table = getPageVar('table', 'str', 'POST', true);
 
-				// TODO: Verify permissions and name of schema
+				// TODO: Verify permissions
 				if($schema && $table)
 				{
 					// Push to session
-					$this->session->__set('PULL_SCHEMA', $schema);
-					$this->session->__set('PULL_TABLE', $table);
+					$this->session->__set('PULL_SCHEMA', THINKER_Object_Schema::createFromDB($schema));
+					$this->session->__set('PULL_TABLE', THINKER_Object_Table::createFromDB($schema, $table));
 					
 					// Redirect to next step
 					redirect('DataPull', 'dataSelect');
@@ -263,10 +260,10 @@ class THINKER_Section_DataPull extends THINKER_Section
 	public function filterSelect()
 	{
 		// Check for schema information
-		$schema = $this->session->__get('PULL_SCHEMA');
-		$table = $this->session->__get('PULL_TABLE');
+		$Schema = $this->session->__get('PULL_SCHEMA');
+		$Table = $this->session->__get('PULL_TABLE');
 
-		if($schema && $table)
+		if(!empty($Schema) && !empty($Table))
 		{
 			// Get columns
 			$columns = $this->session->__get('PULL_COLUMNS');
@@ -417,11 +414,8 @@ class THINKER_Section_DataPull extends THINKER_Section
 					break;
 				}
 
-				// Get table friendly name
-				$ParentTable = THINKER_Object_Table::createFromDB($schema, $table);
-
-				$this->set('schemaName', $schema);
-				$this->set('tableName', $ParentTable->getTableName());
+				$this->set('schemaName', $Schema->getSchemaName());
+				$this->set('tableName', $Table->getTableFriendlyName());
 				$this->set('columns', $columns);
 			}
 			else
