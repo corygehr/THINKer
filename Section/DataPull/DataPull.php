@@ -394,7 +394,7 @@ class THINKER_Section_DataPull extends THINKER_Section
 									$value = getPageVar($filterValueName, 'str', 'POST', false);
 									$andOr = getPageVar($filterAndOrName, 'str', 'POST', false);
 
-									if($option && $value)
+									if($option && ($value || (!$value && ($option == 'FALSE' || $option == 'TRUE'))))
 									{
 										// If no AndOr, then assume AND
 										if(!$andOr && $count == 1)

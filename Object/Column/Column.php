@@ -156,6 +156,71 @@ class THINKER_Object_Column extends THINKER_Object
 	}
 
 	/**
+	 * getColumnFilters()
+	 * Returns an array of the filters that can be used for the column type
+	 *
+	 * @access public
+	 * @static
+	 * @param $columnType: Column short type
+	 * @return Array of Filters
+	 */
+	public static function getColumnFilters($columnType)
+	{
+		$filters = array();
+
+		switch($columnType)
+		{
+			case 'bigint':
+			case 'decimal':
+			case 'double':
+			case 'float':
+			case 'int':
+			case 'smallint':
+				$filters = array(
+					'EQUALS' => '=',
+					'GT' => '>',
+					'GTE' => '>=',
+					'LT' => '<',
+					'LTE' => '<='
+					);
+			break;
+
+			case 'date':
+			case 'datetime':
+			case 'time':
+			case 'timestamp':
+				$filters = array(
+					'BEFORE' => 'Before',
+					'BEFORE_INCL' => 'Before (Inclusive)',
+					'AFTER' => 'After',
+					'AFTER_INCL' => 'After (Inclusive)',
+					'EQUALS' => 'Equals'
+					);
+			break;
+
+			case 'tinyint':
+				$filters = array(
+					'FALSE' => 'False',
+					'TRUE' => 'True'
+					);
+			break;
+
+			default:
+				// Varchar, Char, Enum Typically
+				$filters = array(
+					'CONTAINS' => 'Contains',
+					'EQUALS' => 'Equals',
+					'LIKE' => 'Like',
+					'STARTS_WITH' => 'Starts With',
+					'ENDS_WITH' => 'Ends With'
+					);
+			break;
+		}
+
+		return $filters;
+	}
+
+	/**
 	 * getColumnFriendlyName()
 	 * Returns the column comment if available, or else returns the column name
 	 *
@@ -244,6 +309,30 @@ class THINKER_Object_Column extends THINKER_Object
 	public function getColumnType()
 	{
 		return $this->columnType;
+	}
+
+	/**
+	 * getFilter()
+	 * Returns the value of the specified filter
+	 *
+	 * @access public
+	 * @static
+	 * @param $filter: Filter Name
+	 * @param $value: Inputted value
+	 * @return Filter Value
+	 */
+	public static function getFilterValue($filter, $value)
+	{
+		switch($filter)
+		{
+			case 'GT':
+				return '>';
+			break;
+
+			case 'LT':
+
+			break;
+		}
 	}
 
 	/**
