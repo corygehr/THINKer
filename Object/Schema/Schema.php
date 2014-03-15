@@ -11,21 +11,22 @@ class THINKER_Object_Schema extends THINKER_Object
 	private $schemaName;
 
 	/**
-	 * __construct()
-	 * Constructor for the THINKER_Object_Schema Class
+	 * createFromDB()
+	 * Constructor for the THINKER_Object_Schema Class that gets properties from the database
+	 * Currently useless, except for validating schema actually exists
 	 *
-	 * @author Cory Gehr
 	 * @access public
+	 * @static
 	 * @param $schemaName: Schema Name
+	 * @return THINKER_Object_Schema Object
 	 */
-	public function __construct($schemaName)
+	public static function createFromDB($schemaName)
 	{
 		global $_DB;
 
-		// Call parent constructor
-		parent::__construct();
+		$Object = new THINKER_Object_Schema();
 
-		// Query for Schema Existence
+		// Query for Schema
 		$query = "SELECT COUNT(1)
 				  FROM INFORMATION_SCHEMA.SCHEMATA 
 				  WHERE SCHEMA_NAME = :schemaName 
@@ -39,51 +40,34 @@ class THINKER_Object_Schema extends THINKER_Object
 		{
 			// Load data into object
 			$this->schemaName = $schemaName;
+
+			return $Object;
 		}
 		else
 		{
-			// Throw error
-			trigger_error("Schema '$schemaName' does not exist");
+			return false;
 		}
 	}
-	
+
 	/**
-	 * fetchSchemaTables()
-	 * Returns an array of the tables contained in the specified schema
+	 * createFromParams()
+	 * Constructor for the THINKER_Object_Schema Class that gets properties from the specified values
 	 *
 	 * @access public
 	 * @static
-	 * @param $schemaName: Name of the Schema
-	 * @return Array of THINKER_Object_Table Objects
+	 * @param $schemaName: Schema Name
+	 * @return THINKER_Object_Schema Object
 	 */
-	public static function fetchSchemaTables($schemaName)
+	public static function createFromParams($schemaName)
 	{
 		global $_DB;
 
-		// Query for table names
-		$query = "SELECT TABLE_NAME
-				  FROM INFORMATION_SCHEMA.TABLES
-				  WHERE TABLE_SCHEMA = :schemaName 
-				  ORDER BY TABLE_NAME";
-		$params = array(':schemaName' => $schemaName);
+		$Object = new THINKER_Object_Schema();
 
-		$statement = $_DB->prepare($query);
-		$statement->execute($params);
-		$results = $statement->fetchAll(PDO::FETCH_NUM);
+		// Set values
+		$this->schemaName = $schemaName;
 
-		$output = array();
-
-		if($results)
-		{
-			foreach($results as $t)
-			{
-				list($tableName) = $t;
-				// Load new tables and add to the output array
-				$output[$tableName] = new THINKER_Object_Table($schemaName, $tableName);
-			}
-		}
-
-		return $output;
+		return $Object;
 	}
 
 	/**
@@ -174,5 +158,19 @@ class THINKER_Object_Schema extends THINKER_Object
 		}
 
 		return $output;
+	}
+
+	/**
+	 * setSchemaName()
+	 * Sets the name of the current schema
+	 *
+	 * @access public
+	 * @param $value: New Property Value
+	 * @return Property Value
+	 */
+	public function setSchemaName($value)
+	{
+		$this->schemaName = $value;
+		return $this->schemaName();
 	}
 }

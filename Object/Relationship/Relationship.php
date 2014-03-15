@@ -21,47 +21,6 @@ class THINKER_Object_Relationship extends THINKER_Object
 	private $refColumnName;
 
 	/**
-	 * createFromParams()
-	 * Constructor for the THINKER_Object_Relationship Class that uses parameters for creation
-	 *
-	 * @author Cory Gehr
-	 * @access public
-	 * @static
-	 * @param $relationName: Name of the Relationship
-	 * @param $sourceSchema: Source Schema
-	 * @param $sourceTable: Source Table
-	 * @param $sourceTableName: Source Table Friendly Name
-	 * @param $sourceColumn: Source Column
-	 * @param $sourceColumnName: Source Column Friendly Name
-	 * @param $refSchema: Referenced Schema
-	 * @param $refTable: Referenced Table
-	 * @param $refTableName: Referenced Table Friendly Name
-	 * @param $refColumn: Referenced Column
-	 * @param $refColumnName: Referenced Column Friendly Name
-	 * @return THINKER_Object_Relationship Object
-	 */
-	public static function createFromParams($relationName, $sourceSchema, $sourceTable, $sourceTableName, $sourceColumn, 
-								$sourceColumnName, $refSchema, $refTable, $refTableName, $refColumn, $refColumnName)
-	{
-		$Object = new THINKER_Object_Relationship();
-
-		// Set values
-		$Object->setRelationshipName($relationName);
-		$Object->setSourceSchema($sourceSchema);
-		$Object->setSourceTable($sourceTable);
-		$Object->setSourceTableName($sourceTableName);
-		$Object->setSourceColumn($sourceColumn);
-		$Object->setSourceColumnName($sourceColumnName);
-		$Object->setReferencedSchema($refSchema);
-		$Object->setReferencedTable($refTable);
-		$Object->setReferencedTableName($refTableName);
-		$Object->setReferencedColumn($refColumn);
-		$Object->setReferencedColumnName($refColumnName);
-
-		return $obj;
-	}
-
-	/**
 	 * createFromDB()
 	 * Constructor for the THINKER_Object_Relationship Class that uses the database to create an object
 	 *
@@ -126,6 +85,47 @@ class THINKER_Object_Relationship extends THINKER_Object
 	}
 
 	/**
+	 * createFromParams()
+	 * Constructor for the THINKER_Object_Relationship Class that uses parameters for creation
+	 *
+	 * @author Cory Gehr
+	 * @access public
+	 * @static
+	 * @param $relationName: Name of the Relationship
+	 * @param $sourceSchema: Source Schema
+	 * @param $sourceTable: Source Table
+	 * @param $sourceTableName: Source Table Friendly Name
+	 * @param $sourceColumn: Source Column
+	 * @param $sourceColumnName: Source Column Friendly Name
+	 * @param $refSchema: Referenced Schema
+	 * @param $refTable: Referenced Table
+	 * @param $refTableName: Referenced Table Friendly Name
+	 * @param $refColumn: Referenced Column
+	 * @param $refColumnName: Referenced Column Friendly Name
+	 * @return THINKER_Object_Relationship Object
+	 */
+	public static function createFromParams($relationName, $sourceSchema, $sourceTable, $sourceTableName, $sourceColumn, 
+								$sourceColumnName, $refSchema, $refTable, $refTableName, $refColumn, $refColumnName)
+	{
+		$Object = new THINKER_Object_Relationship();
+
+		// Set values
+		$Object->setRelationshipName($relationName);
+		$Object->setSourceSchema($sourceSchema);
+		$Object->setSourceTable($sourceTable);
+		$Object->setSourceTableName($sourceTableName);
+		$Object->setSourceColumn($sourceColumn);
+		$Object->setSourceColumnName($sourceColumnName);
+		$Object->setReferencedSchema($refSchema);
+		$Object->setReferencedTable($refTable);
+		$Object->setReferencedTableName($refTableName);
+		$Object->setReferencedColumn($refColumn);
+		$Object->setReferencedColumnName($refColumnName);
+
+		return $Object;
+	}
+
+	/**
 	 * getRelationshipName()
 	 * Returns the name of the relationship
 	 *
@@ -158,7 +158,14 @@ class THINKER_Object_Relationship extends THINKER_Object
 	 */
 	public function getReferencedColumnName()
 	{
-		return $this->refColumnName;
+		if($this->refColumnName)
+		{
+			return $this->refColumnName;
+		}
+		else
+		{
+			return $this->getReferencedColumn();
+		}
 	}
 
 	/**
@@ -194,7 +201,14 @@ class THINKER_Object_Relationship extends THINKER_Object
 	 */
 	public function getReferencedTableName()
 	{
-		return $this->refTableName;
+		if($this->refTableName)
+		{
+			return $this->refTableName;
+		}
+		else
+		{
+			return $this->getReferencedTable();
+		}
 	}
 
 	/**
@@ -218,7 +232,14 @@ class THINKER_Object_Relationship extends THINKER_Object
 	 */
 	public function getSourceColumnName()
 	{
-		return $this->sourceColumnName;
+		if($this->sourceColumnName)
+		{
+			return $this->sourceColumnName;
+		}
+		else
+		{
+			return $this->getSourceColumn();
+		}
 	}
 
 	/**
@@ -247,14 +268,21 @@ class THINKER_Object_Relationship extends THINKER_Object
 
 	/**
 	 * getSourceTableName()
-	 * Returns the friendly name of the source table
+	 * Returns the friendly name of the source table, if it exists. Otherwise, returns the source table name.
 	 *
 	 * @access public
 	 * @return Source Table Friendly Name
 	 */
 	public function getSourceTableName()
 	{
-		return $this->sourceTableName;
+		if($this->sourceTableName)
+		{
+			return $this->sourceTableName;
+		}
+		else
+		{
+			return $this->getSourceTable();
+		}
 	}
 
 	/**

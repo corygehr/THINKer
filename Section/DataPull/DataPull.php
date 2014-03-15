@@ -29,7 +29,7 @@ class THINKER_Section_DataPull extends THINKER_Section
 			{
 				// Get filters
 				$filters = $this->session->__get('PULL_FILTERS');
-				var_dump($columns);
+				
 				if(isset($filters))
 				{
 					// Generate DataSet
@@ -86,7 +86,7 @@ class THINKER_Section_DataPull extends THINKER_Section
 		if($schema && $table)
 		{
 			// Get table friendly name
-			$ParentTable = new THINKER_Object_Table($schema, $table);
+			$ParentTable = THINKER_Object_Table::createFromDB($schema, $table);
 
 			$this->set('schemaName', $schema);
 			$this->set('tableName', $ParentTable->getTableFriendlyName());
@@ -110,22 +110,15 @@ class THINKER_Section_DataPull extends THINKER_Section
 				// Compile columns from relationship tables
 				foreach($relationships as $t)
 				{
-					list($refSchema, $refTable, $refTableComment, $columnName, $columnComment, $refColumnName) = $t;
-
-					if(!$refTableComment)
-					{
-						$refTableComment = $refTable;
-					}
-
 					// Add FK Column Comment to Foreign Table
-					$refTableComment .= " ($columnComment)";
+					$refTableName = $t->getReferencedTableName() . " (" . $t->getSourceColumnName() . ")";
 
 					$columns[] = array(
-						'SCHEMA' => $refSchema,
-						'TABLE' => $refTable,
-						'TABLE_FRIENDLY' => $refTableComment,
-						'COLUMNS' => THINKER_Object_Table::getTableColumnNames($refSchema, $refTable),
-						'REF_COLUMN' => $refColumnName
+						'SCHEMA' => $t->getReferencedSchema(),
+						'TABLE' => $t->getReferencedTable(),
+						'TABLE_FRIENDLY' => $refTableName,
+						'COLUMNS' => THINKER_Object_Table::getTableColumnNames($t->getReferencedSchema(), $t->getReferencedTable()),
+						'REF_COLUMN' => $t->getReferencedColumn()
 						);
 				}
 			}
@@ -298,7 +291,7 @@ class THINKER_Section_DataPull extends THINKER_Section
 							if(count($colParts) === 3)
 							{
 								// Get the column data type
-								$Column = new THINKER_Object_Column($colParts[0], $colParts[1], $colParts[2]);
+								$Column = THINKER_Object_Column::createFromDB($colParts[0], $colParts[1], $colParts[2]);
 
 								if(!empty($Column))
 								{
@@ -425,10 +418,10 @@ class THINKER_Section_DataPull extends THINKER_Section
 				}
 
 				// Get table friendly name
-				$ParentTable = new THINKER_Object_Table($schema, $table);
+				$ParentTable = THINKER_Object_Table::createFromDB($schema, $table);
 
 				$this->set('schemaName', $schema);
-				$this->set('tableName', $ParentTable->getTableFriendlyName());
+				$this->set('tableName', $ParentTable->getTableName());
 				$this->set('columns', $columns);
 			}
 			else

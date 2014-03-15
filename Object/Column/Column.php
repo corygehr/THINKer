@@ -17,25 +17,25 @@ class THINKER_Object_Column extends THINKER_Object
 	private $columnComment;
 	private $columnTable;
 	private $columnSchema;
-	
+
 	/**
-	 * __construct()
-	 * Constructor for the THINKER_Object_Column Class
+	 * createFromDB()
+	 * Constructor for the THINKER_Object_Column Class that creates objects from the database
 	 *
-	 * @author Cory Gehr
 	 * @access public
+	 * @static
 	 * @param $schemaName: Schema Name
 	 * @param $tableName: Table Name
 	 * @param $columnName: Column Name
+	 * @return THINKER_Object_Column Object
 	 */
-	public function __construct($schemaName, $tableName, $columnName)
+	public static function createFromDB($schemaName, $tableName, $columnName)
 	{
 		global $_DB;
 
-		// Call parent constructor
-		parent::__construct();
+		$Object = new THINKER_Object_Column();
 
-		// Query for Table Existence
+		// Pull column info from database
 		$query = "SELECT COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE, COLUMN_TYPE, 
 				  CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION, 
 				  COLUMN_COMMENT
@@ -50,48 +50,85 @@ class THINKER_Object_Column extends THINKER_Object
 		$statement->execute($params);
 
 		// Will only contain one row
-		$result = $statement->fetch();
+		$result = $statement->fetch(PDO::FETCH_ASSOC);
 
 		if($result)
 		{
 			// Load data into object
-			$this->columnSchema = $schemaName;
-			$this->columnTable = $tableName;
-			$this->columnName = $columnName;
-			$this->columnDefault = $result['COLUMN_DEFAULT'];
+			$Object->setColumnSchema($schemaName);
+			$Object->setColumnTable($tableName);
+			$Object->setColumnName($columnName);
+			$Object->setColumnDefaultValue($result['COLUMN_DEFAULT']);
 
 			if($result['IS_NULLABLE'] == 'Yes')
 			{
-				$this->columnNullable = true;
+				$Object->setNullable(true);
 			}
 			else
 			{
-				$this->columnNullable = false;
+				$Object->setNullable(false);
 			}
 
-			$this->columnType = $result['DATA_TYPE'];
-			$this->columnFullType = $result['COLUMN_TYPE'];
+			$Object->setColumnType($result['DATA_TYPE']);
+			$Object->setColumnFullType($result['COLUMN_TYPE']);
 
 			if($result['CHARACTER_MAXIMUM_LENGTH'])
 			{
-				$this->columnMaxLength = $result['CHARACTER_MAXIMUM_LENGTH'];
+				$Object->setColumnMaxLength($result['CHARACTER_MAXIMUM_LENGTH']);
 			}
 			elseif($result['NUMERIC_PRECISION'])
 			{
-				$this->columnMaxLength = $result['NUMERIC_PRECISION'];
+				$Object->setColumnMaxLength($result['NUMERIC_PRECISION']);
 			}
 			else
 			{
-				$this->columnMaxLength = null;
+				$Object->setColumnMaxLength(null);
 			}
 
-			$this->columnComment = $result['COLUMN_COMMENT'];
+			$Object->setColumnComment($result['COLUMN_COMMENT']);
+
+			return $Object;
 		}
 		else
 		{
-			// Throw error
-			trigger_error("Column '$columnName' in Table '$tableName' in Schema '$schemaName' does not exist");
+			return false;
 		}
+	}
+
+	/**
+	 * createFromParams()
+	 * Constructor for the THINKER_Object_Column Class that creates objects from the provided values
+	 *
+	 * @access public
+	 * @static
+	 * @param $schemaName: Schema Name
+	 * @param $tableName: Table Name
+	 * @param $columnName: Column Name
+	 * @param $defaultValue: Column Default Value
+	 * @param $nullable: Column Allows Nulls
+	 * @param $dataType: Short Data Type Definition
+	 * @param $fullType: Full Data Type Definition
+	 * @param $maxLength: Max Length of Column
+	 * @param $columnComment: Column Comment
+	 * @return THINKER_Object_Column Object
+	 */
+	public static function createFromParams($schemaName, $tableName, $columnName, $defaultValue, 
+											$nullable, $dataType, $fullType, $maxLength, $columnComment)
+	{
+		$Object = new THINKER_Object_Column();
+
+		// Set values
+		$Object->setColumnSchema($schemaName);
+		$Object->setColumnTable($tableName);
+		$Object->setColumnName($columnName);
+		$Object->setColumnDefaultValue($defaultValue);
+		$Object->setNullable($nullable);
+		$Object->setColumnType($dataType);
+		$Object->setColumnFullType($fullType);
+		$Object->setColumnMaxLength($maxLength);
+		$Object->setColumnComment($columnComment);
+
+		return $Object;
 	}
 
 	/**
@@ -218,6 +255,132 @@ class THINKER_Object_Column extends THINKER_Object
 	 */
 	public function isNullable()
 	{
+		return $this->columnNullable;
+	}
+
+	/**
+	 * setColumnComment()
+	 * Sets the comment on the current column
+	 *
+	 * @access public
+	 * @param $value: New Property Value
+	 * @return Column Comment
+	 */
+	public function setColumnComment($value)
+	{
+		$this->columnComment = $value;
+		return $this->columnComment;
+	}
+
+	/**
+	 * setColumnDefaultValue()
+	 * Sets the default value of the current column
+	 *
+	 * @access public
+	 * @param $value: New Property Value
+	 * @return Column Default Value
+	 */
+	public function setColumnDefaultValue($value)
+	{
+		$this->columnDefault = $value;
+		return $this->columnDefault;
+	}
+
+	/**
+	 * setColumnFullType()
+	 * Sets the full data type of the current column
+	 *
+	 * @access public
+	 * @param $value: New Property Value
+	 * @return Column Full Type
+	 */
+	public function setColumnFullType($value)
+	{
+		$this->columnFullType = $value;
+		return $this->columnFullType;
+	}
+
+	/**
+	 * setColumnMaxLength()
+	 * Sets the maximum length of the current column
+	 *
+	 * @access public
+	 * @param $value: New Property Value
+	 * @return Max Column Length
+	 */
+	public function setColumnMaxLength($value)
+	{
+		$this->columnMaxLength = $value;
+		return $this->columnMaxLength;
+	}
+
+	/**
+	 * setColumnName()
+	 * Sets the name of the current column
+	 *
+	 * @access public
+	 * @param $value: New Property Value
+	 * @return Column Name
+	 */
+	public function setColumnName($value)
+	{
+		$this->columnName = $value;
+		return $this->columnName;
+	}
+
+	/**
+	 * setColumnSchema()
+	 * Sets the name of the column's schema
+	 *
+	 * @access public
+	 * @param $value: New Property Value
+	 * @return Column Schema
+	 */
+	public function setColumnSchema($value)
+	{
+		$this->columnSchema = $value;
+		return $this->columnSchema;
+	}
+
+	/**
+	 * setColumnTable()
+	 * Sets the name of the column's table
+	 *
+	 * @access public
+	 * @param $value: New Property Value
+	 * @return Column Table
+	 */
+	public function setColumnTable($value)
+	{
+		$this->columnTable = $value;
+		return $this->columnTable;
+	}
+
+	/**
+	 * setColumnType()
+	 * Sets the data type of the current column
+	 *
+	 * @access public
+	 * @param $value: New Property Value
+	 * @return Column Type
+	 */
+	public function setColumnType($value)
+	{
+		$this->columnType = $value;
+		return $this->columnType;
+	}
+
+	/**
+	 * setNullable()
+	 * Sets the nullable status of the column
+	 *
+	 * @access public
+	 * @param $value: New Property Value
+	 * @return Column Nullable Status
+	 */
+	public function setNullable($value)
+	{
+		$this->columnNullable = $value;
 		return $this->columnNullable;
 	}
 }

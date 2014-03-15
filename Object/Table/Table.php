@@ -14,20 +14,20 @@ class THINKER_Object_Table extends THINKER_Object
 	private $tableSchema;
 
 	/**
-	 * __construct()
-	 * Constructor for the THINKER_Object_Table Class
+	 * createFromDB()
+	 * Constructor for the THINKER_Object_Table Class that gets properties from the database
 	 *
-	 * @author Cory Gehr
 	 * @access public
+	 * @static
 	 * @param $schemaName: Schema Name
 	 * @param $tableName: Table Name
+	 * @return THINKER_Object_Table Object
 	 */
-	public function __construct($schemaName, $tableName)
+	public static function createFromDB($schemaName, $tableName)
 	{
 		global $_DB;
 
-		// Call parent constructor
-		parent::__construct();
+		$Object = new THINKER_Object_Table();
 
 		// Query for Table Existence
 		$query = "SELECT ENGINE, TABLE_COMMENT
@@ -46,16 +46,42 @@ class THINKER_Object_Table extends THINKER_Object
 		if($result)
 		{
 			// Load data into object
-			$this->tableName = $tableName;
-			$this->tableEngine = $result['ENGINE'];
-			$this->tableComment = $result['TABLE_COMMENT'];
-			$this->tableSchema = $schemaName;
+			$Object->setTableName($tableName);
+			$Object->setTableEngine($result['ENGINE']);
+			$Object->setTableComment($result['TABLE_COMMENT']);
+			$Object->setTableSchema($schemaName);
+
+			return $Object;
 		}
 		else
 		{
-			// Throw error
-			trigger_error("Table '$tableName' in Schema '$schemaName' does not exist");
+			return false;
 		}
+	}
+
+	/**
+	 * createFromParams()
+	 * Constructor for the THINKER_Object_Table Class that gets properties from the provided values
+	 *
+	 * @access public
+	 * @static
+	 * @param $schemaName: Schema Name
+	 * @param $tableName: Table Name
+	 * @param $tableEngine: Table Engine
+	 * @param $tableComment: Table Comment
+	 * @return THINKER_Object_Table Object
+	 */
+	public static function createFromParams($schemaName, $tableName, $tableEngine, $tableComment)
+	{
+		$Object = new THINKER_Object_Table();
+
+		// Set values
+		$Object->setTableSchema($schemaName);
+		$Object->setTableName($tableName);
+		$Object->setTableEngine($tableEngine);
+		$Object->setTableComment($tableComment);
+
+		return $Object;
 	}
 
 	/**
@@ -99,47 +125,6 @@ class THINKER_Object_Table extends THINKER_Object
 
 				$output[] = THINKER_Object_Relationship::createFromParams($relationName, $this->getTableSchema(), $this->getTableName(), $this->getTableFriendlyName(), 
 					$columnName, $columnComment, $refSchema, $refTable, $refTableComment, $refColumnName, $refColumnComment);
-			}
-		}
-
-		return $output;
-	}
-
-	/**
-	 * fetchTableColumns()
-	 * Returns an array of the columns contained in the specified table
-	 *
-	 * @access public
-	 * @static
-	 * @param $schemaName: Name of the Schema
-	 * @param $tableName: Name of the Table
-	 * @return Array of THINKER_Object_Column Objects
-	 */
-	public static function fetchTableColumns($schemaName, $tableName)
-	{
-		global $_DB;
-
-		// Query for table names
-		$query = "SELECT COLUMN_NAME 
-				  FROM INFORMATION_SCHEMA.COLUMNS 
-				  WHERE TABLE_SCHEMA = :schemaName 
-				  AND TABLE_NAME = :tableName 
-				  ORDER BY TABLE_NAME";
-		$params = array(':schemaName' => $schemaName, ':tableName' => $tableName);
-
-		$statement = $_DB->prepare($query);
-		$statement->execute($params);
-		$results = $statement->fetchAll(PDO::FETCH_NUM);
-
-		$output = array();
-
-		if($results)
-		{
-			foreach($results as $c)
-			{
-				list($columnName) = $c;
-				// Load new tables and add to the output array
-				$output[$columnName] = new THINKER_Object_Column($schemaName, $tableName, $columnName);
 			}
 		}
 
@@ -231,7 +216,7 @@ class THINKER_Object_Table extends THINKER_Object
 		}
 		else
 		{
-			return $this->tableName;
+			return $this->getTableName();
 		}
 	}
 
@@ -256,6 +241,62 @@ class THINKER_Object_Table extends THINKER_Object
 	 */
 	public function getTableSchema()
 	{
+		return $this->tableSchema;
+	}
+
+	/**
+	 * setTableComment()
+	 * Sets the Comment listed for the current Table
+	 *
+	 * @access public
+	 * @param $value: New Property Value
+	 * @return Table Comment
+	 */
+	public function setTableComment($value)
+	{
+		$this->tableComment = $value;
+		return $this->tableComment;
+	}
+
+	/**
+	 * setTableEngine()
+	 * Sets the Engine of the current Table
+	 *
+	 * @access public
+	 * @param $value: New Property Value
+	 * @return Table Engine
+	 */
+	public function setTableEngine($value)
+	{
+		$this->tableEngine = $value;
+		return $this->tableEngine;
+	}
+
+	/**
+	 * setTableName()
+	 * Sets the name of the current table
+	 *
+	 * @access public
+	 * @param $value: New Property Value
+	 * @return Table Name
+	 */
+	public function setTableName($value)
+	{
+		$this->tableName = $value;
+		return $this->tableName;
+	}
+
+	/**
+	 * setTableSchema()
+	 * Sets the name of the current table's schema
+	 *
+	 * @access public
+	 * @param $value: New Property Value
+	 * @return Schema Name
+	 */
+	public function setTableSchema($value)
+	{
+		$this->tableSchema = $value;
 		return $this->tableSchema;
 	}
 }
