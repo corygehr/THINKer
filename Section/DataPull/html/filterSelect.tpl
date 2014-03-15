@@ -23,7 +23,7 @@
 		<legend>Select Filters</legend>
 		<div id='1'>
 			<select id='filter-col_1' class='colFilter' name='filter-col_1'>
-				<option>Choose a Data Point:</option>
+				<option value>Choose a Data Point:</option>
 <?php
 	// Get columns and create options for them
 	$options = $this->get('columns');

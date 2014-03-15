@@ -381,7 +381,7 @@ class THINKER_Section_DataPull extends THINKER_Section
 							$filterValueName = "filter-value_$count";
 
 							$column = getPageVar($filterColName, 'str', 'POST', false);
-
+							
 							if(!empty($column))
 							{
 								// Get Column Object
