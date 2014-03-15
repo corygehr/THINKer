@@ -39,7 +39,7 @@ class THINKER_Object_Schema extends THINKER_Object
 		if($statement->fetchColumn(0) == 1)
 		{
 			// Load data into object
-			$this->schemaName = $schemaName;
+			$Object->schemaName = $schemaName;
 
 			return $Object;
 		}

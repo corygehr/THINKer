@@ -16,7 +16,7 @@
 	</ol>
 </div>
 <p>
-	Welcome to the THINKer! To begin, please choose a data source below:
+	To begin, please choose a data source below:
 </p>
 <form id='dsSelect' method='post' action='<?php echo createUrl('DataPull', 'dsSelect', array('phase' => 'proceed')); ?>'>
 	<fieldset>

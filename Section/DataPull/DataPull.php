@@ -17,8 +17,8 @@ class THINKER_Section_DataPull extends THINKER_Section
 	public function dataReview()
 	{
 		// Check for schema information
-		$Schema = $this->session->__get('PULL_SCHEMA');
-		$Table = $this->session->__get('PULL_TABLE');
+		$Schema = $this->session->__get('PRIMARY_SCHEMA');
+		$Table = $this->session->__get('PRIMARY_TABLE');
 
 		if(!empty($Schema) && !empty($Table))
 		{
@@ -80,42 +80,35 @@ class THINKER_Section_DataPull extends THINKER_Section
 	public function dataSelect()
 	{
 		// Check for schema information
-		$Schema = $this->session->__get('PULL_SCHEMA');
-		$Table = $this->session->__get('PULL_TABLE');
+		$Schema = $this->session->__get('PRIMARY_SCHEMA');
+		$Table = $this->session->__get('PRIMARY_TABLE');
 
 		if(!empty($Schema) && !empty($Table))
 		{
 			$this->set('schemaName', $Schema->getSchemaName());
 			$this->set('tableName', $Table->getTableFriendlyName());
 
-			// Get the columns for this table, and those it has relationships to
-			$columns = array();
+			// Get the tables to reference
+			$Tables = array();
 
-			$columns[] = array(
-				'SCHEMA' => $Schema,
-				'TABLE' => $Table->getTableName(),
-				'TABLE_FRIENDLY' => $Table->getTableFriendlyName(),
+			$Tables[] = array(
+				'TABLE' => $Table,
 				'COLUMNS' => THINKER_Object_Table::getTableColumnNames($Schema->getSchemaName(), $Table->getTableName()),
-				'REF_COLUMN' => null
+				'RELATIONSHIP' => null
 				);
 
 			// Discover relationships
-			$relationships = $Table->discoverRelationships();
+			$Relationships = $Table->discoverRelationships();
 
-			if($relationships)
+			if($Relationships)
 			{
 				// Compile columns from relationship tables
-				foreach($relationships as $t)
+				foreach($Relationships as $T)
 				{
-					// Add FK Column Comment to Foreign Table
-					$refTableName = $t->getReferencedTableName() . " (" . $t->getSourceColumnName() . ")";
-
-					$columns[] = array(
-						'SCHEMA' => $t->getReferencedSchema(),
-						'TABLE' => $t->getReferencedTable(),
-						'TABLE_FRIENDLY' => $refTableName,
-						'COLUMNS' => THINKER_Object_Table::getTableColumnNames($t->getReferencedSchema(), $t->getReferencedTable()),
-						'REF_COLUMN' => $t->getReferencedColumn()
+					$Tables[] = array(
+						'TABLE' => THINKER_Object_Table::createFromDB($T->getReferencedSchema(), $T->getReferencedTable()),
+						'COLUMNS' => THINKER_Object_Table::getTableColumnNames($T->getReferencedSchema(), $T->getReferencedTable()),
+						'RELATIONSHIP' => $T
 						);
 				}
 			}
@@ -134,19 +127,25 @@ class THINKER_Section_DataPull extends THINKER_Section
 					// For each column, create the expected ID string and try to grab its value
 					$selectCols = array();
 
-					foreach($columns as $c)
+					foreach($Tables as $t)
 					{
-						$schemaName = $c['SCHEMA'];
-						$tableName = $c['TABLE'];
-						$tableFriendlyName = $c['TABLE_FRIENDLY'];
-						$cols = $c['COLUMNS'];
-						$refCol = $c['REF_COLUMN'];
+						$ColTable = $t['TABLE'];
+						$cols = $t['COLUMNS'];
+						$ColRelationship = $t['RELATIONSHIP'];
 
 						// Loop through cols
 						foreach($cols as $col)
 						{
 							list($colName, $colFriendlyName) = $col;
-							$id = $this->createColId($schemaName, $tableName, $colName);
+
+							$srcRelationCol = null;
+
+							if(!empty($ColRelationship))
+							{
+								$srcRelationCol = $ColRelationship->getSourceColumn();
+							}
+
+							$id = $this->createColId($ColTable->getTableSchema(), $ColTable->getTableName(), $colName, $srcRelationCol);
 
 							// Pull data
 							$val = getPageVar($id, 'checkbox', 'POST', false);
@@ -155,12 +154,9 @@ class THINKER_Section_DataPull extends THINKER_Section
 							{
 								// Add to list of columns to pull
 								$selectCols[$id] = array(
-									'SCHEMA' => $schemaName,
-									'TABLE' => $tableName,
-									'TABLE_FRIENDLY' => $tableFriendlyName,
-									'COLUMN' => $colName,
-									'FRIENDLY_NAME' => $colFriendlyName,
-									'REF_COLUMN' => $refCol
+									'TABLE' => $ColTable,
+									'COLUMN' => THINKER_Object_Column::createFromDB($ColTable->getTableSchema(), $ColTable->getTableName(), $colName),
+									'RELATIONSHIP' => $ColRelationship
 									);
 							}
 						}
@@ -180,7 +176,7 @@ class THINKER_Section_DataPull extends THINKER_Section
 				break;
 			}
 
-			$this->set('columns', $columns);
+			$this->set('tables', $Tables);
 		}
 		else
 		{
@@ -232,8 +228,8 @@ class THINKER_Section_DataPull extends THINKER_Section
 				if($schema && $table)
 				{
 					// Push to session
-					$this->session->__set('PULL_SCHEMA', THINKER_Object_Schema::createFromDB($schema));
-					$this->session->__set('PULL_TABLE', THINKER_Object_Table::createFromDB($schema, $table));
+					$this->session->__set('PRIMARY_SCHEMA', THINKER_Object_Schema::createFromDB($schema));
+					$this->session->__set('PRIMARY_TABLE', THINKER_Object_Table::createFromDB($schema, $table));
 					
 					// Redirect to next step
 					redirect('DataPull', 'dataSelect');
@@ -260,8 +256,8 @@ class THINKER_Section_DataPull extends THINKER_Section
 	public function filterSelect()
 	{
 		// Check for schema information
-		$Schema = $this->session->__get('PULL_SCHEMA');
-		$Table = $this->session->__get('PULL_TABLE');
+		$Schema = $this->session->__get('PRIMARY_SCHEMA');
+		$Table = $this->session->__get('PRIMARY_TABLE');
 
 		if(!empty($Schema) && !empty($Table))
 		{
@@ -284,8 +280,8 @@ class THINKER_Section_DataPull extends THINKER_Section
 							// Parse column provided
 							$colParts = explode('-|-', $column);
 
-							// Needs to be three parts
-							if(count($colParts) === 3)
+							// Needs to be three or four parts
+							if(count($colParts) === 3 || count($colParts) === 4)
 							{
 								// Get the column data type
 								$Column = THINKER_Object_Column::createFromDB($colParts[0], $colParts[1], $colParts[2]);
@@ -437,15 +433,24 @@ class THINKER_Section_DataPull extends THINKER_Section
 	 * createColId()
 	 * Returns the HTML 'id' for a column
 	 *
-	 * @access private
+	 * @access public
+	 * @static
 	 * @param $schema: Schema Name
 	 * @param $table: Table Name
 	 * @param $column: Column Name
+	 * @param $relationCol: Source Table Column for Relationship (default: null)
 	 * @return Column ID
 	 */
-	private function createColId($schema, $table, $column)
+	public static function createColId($schema, $table, $column, $relationCol = null)
 	{
-		return $schema . '-|-' . $table . '-|-' . $column;
+		$id = $schema . '-|-' . $table . '-|-' . $column;
+
+		if($relationCol)
+		{
+			$id .= '-|-' . $relationCol;
+		}
+
+		return $id;
 	}
 }
 ?>

@@ -9,7 +9,6 @@
 class THINKER_Object_Table extends THINKER_Object
 {
 	private $tableName;
-	private $tableEngine;
 	private $tableComment;
 	private $tableSchema;
 
@@ -30,7 +29,7 @@ class THINKER_Object_Table extends THINKER_Object
 		$Object = new THINKER_Object_Table();
 
 		// Query for Table Existence
-		$query = "SELECT ENGINE, TABLE_COMMENT
+		$query = "SELECT TABLE_COMMENT
 				  FROM INFORMATION_SCHEMA.TABLES 
 				  WHERE TABLE_SCHEMA = :schemaName 
 				  AND TABLE_NAME = :tableName 
@@ -47,7 +46,6 @@ class THINKER_Object_Table extends THINKER_Object
 		{
 			// Load data into object
 			$Object->setTableName($tableName);
-			$Object->setTableEngine($result['ENGINE']);
 			$Object->setTableComment($result['TABLE_COMMENT']);
 			$Object->setTableSchema($schemaName);
 
@@ -67,18 +65,16 @@ class THINKER_Object_Table extends THINKER_Object
 	 * @static
 	 * @param $schemaName: Schema Name
 	 * @param $tableName: Table Name
-	 * @param $tableEngine: Table Engine
 	 * @param $tableComment: Table Comment
 	 * @return THINKER_Object_Table Object
 	 */
-	public static function createFromParams($schemaName, $tableName, $tableEngine, $tableComment)
+	public static function createFromParams($schemaName, $tableName, $tableComment)
 	{
 		$Object = new THINKER_Object_Table();
 
 		// Set values
 		$Object->setTableSchema($schemaName);
 		$Object->setTableName($tableName);
-		$Object->setTableEngine($tableEngine);
 		$Object->setTableComment($tableComment);
 
 		return $Object;
@@ -190,18 +186,6 @@ class THINKER_Object_Table extends THINKER_Object
 	}
 
 	/**
-	 * getTableEngine()
-	 * Gets the Engine of the current Table
-	 *
-	 * @access public
-	 * @return Table Engine
-	 */
-	public function getTableEngine()
-	{
-		return $this->tableEngine;
-	}
-
-	/**
 	 * getTableFriendlyName()
 	 * Returns the Table Comment if Available, or else returns the Table Name
 	 *
@@ -256,20 +240,6 @@ class THINKER_Object_Table extends THINKER_Object
 	{
 		$this->tableComment = $value;
 		return $this->tableComment;
-	}
-
-	/**
-	 * setTableEngine()
-	 * Sets the Engine of the current Table
-	 *
-	 * @access public
-	 * @param $value: New Property Value
-	 * @return Table Engine
-	 */
-	public function setTableEngine($value)
-	{
-		$this->tableEngine = $value;
-		return $this->tableEngine;
 	}
 
 	/**

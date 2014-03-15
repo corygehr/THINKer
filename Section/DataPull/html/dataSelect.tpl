@@ -23,19 +23,30 @@
 		<legend>Select Data Points</legend>
 		<div id='data-points'>
 <?php
-	// Get column data
-	$colData = $this->get('columns');
+	// Get table data
+	$tableData = $this->get('tables');
 
 	$titles = '';
 	$divs = '';
 
 	// Echo titles
-	for($i=0;$i<count($colData);$i++)
+	for($i=0;$i<count($tableData);$i++)
 	{
-		$curData = $colData[$i];
+		$curData = $tableData[$i];
+
+		// FriendlyName
+		$friendlyName = $curData['TABLE']->getTableFriendlyName();
+		
+		$srcRelationCol = null;
+
+		if(!empty($curData['RELATIONSHIP']))
+		{
+			$friendlyName .= ' (' . $curData['RELATIONSHIP']->getSourceColumnName() . ')';
+			$srcRelationCol = $curData['RELATIONSHIP']->getSourceColumn();
+		}
 
 		// First grab title
-		$titles .= "<li><a href='#tabs-$i'>" . $curData['TABLE_FRIENDLY'] . "</a></li>";
+		$titles .= "<li><a href='#tabs-$i'>$friendlyName</a></li>";
 
 		// Now generate checkboxes
 		$divs .= "<div id='tabs-$i'>";
@@ -43,9 +54,9 @@
 		// Loop through columns
 		foreach($curData['COLUMNS'] as $c)
 		{
-			list($colName, $friendlyName) = $c;
-			$chkId = $curData['SCHEMA'] . '-|-' . $curData['TABLE'] . '-|-' . $colName;
-			$divs .= "<input type='checkbox' id='$chkId' name='$chkId' /><label for='$chkId'>$friendlyName</label><br />";
+			list($colName, $colFriendly) = $c;
+			$chkId = THINKER_Section_DataPull::createColId($curData['TABLE']->getTableSchema(), $curData['TABLE']->getTableName(), $colName, $srcRelationCol);
+			$divs .= "<input type='checkbox' id='$chkId' name='$chkId' /><label for='$chkId'>$colFriendly</label><br />";
 		}
 
 		// Close div

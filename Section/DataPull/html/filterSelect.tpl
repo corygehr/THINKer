@@ -32,8 +32,14 @@
 	{
 		foreach($options as $o => $val)
 		{
-			$tableFriendly = $val['TABLE_FRIENDLY'];
-			$friendlyName = "[$tableFriendly] " . $val['FRIENDLY_NAME'];
+			$tableFriendly = $val['TABLE']->getTableFriendlyName();
+
+			if(!empty($val['RELATIONSHIP']))
+			{
+				$tableFriendly .= " (" . $val['RELATIONSHIP']->getSourceColumnName() . ")";
+			}
+
+			$friendlyName = "[$tableFriendly] " . $val['COLUMN']->getColumnFriendlyName();
 
 			echo "<option value='$o'>$friendlyName</option>";
 		}
