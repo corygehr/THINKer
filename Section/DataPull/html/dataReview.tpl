@@ -6,7 +6,7 @@
      * @author Cory Gehr
      */
 ?>
-<h1>Welcome!</h1>
+<h1>Results</h1>
 <div id='steps-container'>
 	<ol id='nav-steps'>
 		<li class='completed'>1. Pick Data Source</li>
