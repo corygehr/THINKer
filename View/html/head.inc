@@ -11,6 +11,9 @@
 	<link rel='stylesheet' href='View/html/css/screen.css' type='text/css' media='screen'>
 	<link href='View/html/css/jquery/jquery-ui-1.10.4.custom.min.css' rel='stylesheet'>
 	<meta http-equiv='Content-Type' content='text/html;charset=utf-8'>
+	<meta http-equiv="cache-control" content="no-cache">
+	<link rel="shortcut icon" href="View/html/images/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="View/html/images/favicon.ico" type="image/x-icon">
 	<!-- jQuery 2.1.0 and components -->
 	<script type='text/javascript' src='View/html/js/jquery-2.1.0.min.js'></script>
 	<script type='text/javascript' src='View/html/js/jquery-ui-1.10.4.custom.min.js'></script>
