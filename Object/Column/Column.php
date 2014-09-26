@@ -46,7 +46,7 @@ class THINKER_Object_Column extends THINKER_Object
 				  LIMIT 1";
 		$params = array(':schemaName' => $schemaName, ':tableName' => $tableName, ':columnName' => $columnName);
 
-		$statement = $_DB->prepare($query);
+		$statement = $_DB['thinker']->prepare($query);
 		$statement->execute($params);
 
 		// Will only contain one row

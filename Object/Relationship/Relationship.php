@@ -56,7 +56,7 @@ class THINKER_Object_Relationship extends THINKER_Object
 
 		$params = array(':schemaName' => $sourceSchema, ':tableName' => $sourceTable, ':relationName' => $relationshipName);
 
-		$statement = $_DB->prepare($query);
+		$statement = $_DB['thinker']->prepare($query);
 		$statement->execute($params);
 
 		$result = $statement->fetch(PDO::FETCH_ASSOC);

@@ -43,7 +43,7 @@ class THINKER_Object_DataSet extends THINKER_Object
 		// Pull data
 		$this->compileQuery();
 
-		$statement = $_DB->prepare($this->query);
+		$statement = $_DB['thinker']->prepare($this->query);
 		$statement->execute($this->queryParams);
 
 		$this->returnedData = $statement->fetchAll(PDO::FETCH_ASSOC);

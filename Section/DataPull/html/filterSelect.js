@@ -41,7 +41,7 @@ $('#filterSelect').on('click', '.add', function() {
 	{
 		var andOrName = 'filter-andor_' + newNum;
 		$(newDivId).prepend("<select id='" + andOrName +"' name='" + andOrName +"'><option value='AND'>AND</option><option value='OR'>OR</option></select>");
-		$(newDivId).last().append("<img id='removeButton' class='remove clickable' src='View/html/images/remove.png' width='20' height='20' />");
+		$(newDivId).last().append("<img id='removeButton' class='remove clickable' src='View/html/style/thinker/images/remove.png' width='20' height='20' />");
 	}
 
 	// Hide buttons
@@ -73,7 +73,7 @@ $('#filterSelect').on('change', '.colFilter', function() {
 	var idNo = idStart[1];
 	var targetBox = '#filter-option_' + idNo;
 
-	var url = "index.php?section=DataPull&subsection=filterSelect&phase=fetchFilterTypes&view=json";
+	var url = "index.php?s=DataPull&su=filterSelect&phase=fetchFilterTypes&view=json";
 
 	var dataObj = {};
 

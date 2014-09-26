@@ -53,6 +53,7 @@
 		}
 
 		echo "<p><strong>$rowCount</strong> Results<p>";
+		echo "<p><a href='" . createUrl('DataPull', 'dataReview', array('set' => 'data', 'view' => 'csv')) . "'>Export to CSV</a></p>";
 		// Output table
 		echo "<table><thead>$headings</thead><tbody>$rows</tbody></table>";
 	}

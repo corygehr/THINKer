@@ -33,7 +33,7 @@ class THINKER_Object_Schema extends THINKER_Object
 				  LIMIT 1";
 		$params = array(':schemaName' => $schemaName);
 
-		$statement = $_DB->prepare($query);
+		$statement = $_DB['thinker']->prepare($query);
 		$statement->execute($params);
 
 		if($statement->fetchColumn(0) == 1)
@@ -60,8 +60,6 @@ class THINKER_Object_Schema extends THINKER_Object
 	 */
 	public static function createFromParams($schemaName)
 	{
-		global $_DB;
-
 		$Object = new THINKER_Object_Schema();
 
 		// Set values
@@ -88,7 +86,7 @@ class THINKER_Object_Schema extends THINKER_Object
 				  ORDER BY SCHEMA_NAME";
 
 		// Fetch results
-		$statement = $_DB->prepare($query);
+		$statement = $_DB['thinker']->prepare($query);
 		$statement->execute();
 		$results = $statement->fetchAll();
 
@@ -136,7 +134,7 @@ class THINKER_Object_Schema extends THINKER_Object
 		$params = array(':schemaName' => $schemaName);
 
 		// Fetch results
-		$statement = $_DB->prepare($query);
+		$statement = $_DB['thinker']->prepare($query);
 		$statement->execute($params);
 		$results = $statement->fetchAll(PDO::FETCH_NUM);
 

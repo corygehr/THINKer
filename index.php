@@ -1,46 +1,28 @@
 <?php
 	/**
 	 * index.php
-	 * Primary Controller for THINKer
+	 * Entry point for the web application
 	 * This page handles most of the page load logic
-	 * The rest is contains in the individual Model files
+	 * The rest is contains in the individual Section files
 	 * 
 	 * @author Cory Gehr <gehrc621@gmail.com>
 	 */
 
-// Include required files
-require_once('includes/globals.inc');
-require_once('includes/coreFunctions.inc');
-require_once('includes/dbconnect.inc');
-
-// Initialize system globals
-$config = parse_ini_file('includes/sysconfig.ini', true);
-
-// Set globals
-define('BASE_URL', ($config['thinker_general']['use_ssl'] == true ? 'https://' : 'http://') . $config['thinker_general']['base_url'] . '/');
-define('ENVIRONMENT', $config['thinker_general']['environment']);
-define('CLASS_PREFIX', $config['thinker_general']['class_prefix']);
-define('DEFAULT_VIEW', $config['thinker_general']['default_view']);
-define('SESSION_CLASS', CLASS_PREFIX . 'Session_' . $config['thinker_general']['session_class']);
-
-// Set error handler
-set_error_handler('thinkerErrorHandler');
-
-// Connect to database
-$_DB = new DBConnection();
+// Run initialization script
+require_once('includes/init.inc');
 
 /******************
   Controller Start  
 *******************/
 
 // Load specified section
-if(isset($_GET['section']))
+if(isset($_GET['s']))
 {
-	$_SECTION = getPageVar('section', 'str', 'GET', true);
+	$_SECTION = getPageVar('s', 'str', 'GET', true);
 }
 else
 {
-	$_SECTION = $config['thinker_general']['default_section'];
+	$_SECTION = $_CONFIG['thinker_general']['default_section'];
 }
 
 // Assign section class
@@ -62,9 +44,9 @@ if(file_exists($sectionFile))
 	$sectionConfig = parse_ini_file($sectionPath . 'config.ini', true);
 
 	// Check for sub-section
-	if(isset($_GET['subsection']))
+	if(isset($_GET['su']))
 	{
-		$_SUBSECTION = getPageVar('subsection', 'str', 'GET', true);
+		$_SUBSECTION = getPageVar('su', 'str', 'GET', true);
 	}
 	else
 	{
@@ -92,7 +74,7 @@ if(file_exists($sectionFile))
 	}
 
 	// Compile info array
-	$_INFO['environment'] = $config['thinker_general']['environment'];
+	$_INFO['environment'] = $_CONFIG['thinker_general']['environment'];
 	$_INFO['section'] = $_SECTION;
 	$_INFO['subsection'] = $_SUBSECTION;
 

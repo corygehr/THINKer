@@ -1,6 +1,6 @@
 $('#schema').on('change', function() {
 	var schemaVal =$('#schema').val();
-	var url = "index.php?section=DataPull&subsection=dsSelect&phase=fetchTables&view=json";
+	var url = "index.php?s=DataPull&su=dsSelect&phase=fetchTables&view=json";
 
 	var dataObj = {};
 

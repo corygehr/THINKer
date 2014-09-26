@@ -36,7 +36,7 @@ class THINKER_Object_Table extends THINKER_Object
 				  LIMIT 1";
 		$params = array(':schemaName' => $schemaName, ':tableName' => $tableName);
 
-		$statement = $_DB->prepare($query);
+		$statement = $_DB['thinker']->prepare($query);
 		$statement->execute($params);
 
 		// Will only contain one row
@@ -106,7 +106,7 @@ class THINKER_Object_Table extends THINKER_Object
 				  ORDER BY C.ORDINAL_POSITION, KCU.COLUMN_NAME";
 		$params = array(':schemaName' => $this->getTableSchema(), ':tableName' => $this->getTableName());
 
-		$statement = $_DB->prepare($query);
+		$statement = $_DB['thinker']->prepare($query);
 		$statement->execute($params);
 
 		$results = $statement->fetchAll(PDO::FETCH_NUM);
@@ -149,7 +149,7 @@ class THINKER_Object_Table extends THINKER_Object
 		$params = array(':schemaName' => $schemaName, ':tableName' => $tableName);
 
 		// Fetch results
-		$statement = $_DB->prepare($query);
+		$statement = $_DB['thinker']->prepare($query);
 		$statement->execute($params);
 		$results = $statement->fetchAll(PDO::FETCH_NUM);
 

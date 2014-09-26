@@ -50,7 +50,7 @@
 				<option>Filter Type:</option>
 			</select>
 			<input type='text' id='filter-value_1' name='filter-value_1' placeholder='Filter Value' />
-			<img id='addButton' class='add clickable' src='View/html/images/add.png' width='20' height='20' /> 
+			<img id='addButton' class='add clickable' src='View/html/style/thinker/images/add.png' width='20' height='20' /> 
 		</div>
 		<input type='submit' value='Next >' />
 	</fieldset>

@@ -1,7 +1,7 @@
 <?php
 	/**
 	 * html.php
-	 * Contains the THINKER_View_json class
+	 * Contains the THINKER_View_html class
 	 *
 	 * @author Cory Gehr
 	 */
@@ -16,17 +16,26 @@ class THINKER_View_html extends THINKER_View_Common
 	 */
 	public function display()
 	{
-		global $_MESSAGES, $_SECTION, $_SUBSECTION;
+		global $_DB, $_CONFIG, $_MESSAGES, $_SECTION, $_SUBSECTION;
 
+		// Get the style used
+		$style = $_CONFIG['thinker_view_html']['template'];
+		$styleDir = "View/html/style/$style";
+		
 		// Get the filename for the section's action template
 		$tplFile = 'Section/' . $_SECTION . '/html/' . $_SUBSECTION . '.tpl';
+		$iniFile = 'Section/' . $_SECTION . '/config.ini';
 
 		// Ensure file exists
-		if(!file_exists($tplFile))
+		if(!file_exists($tplFile) || !file_exists($iniFile))
 		{
 			// Redirect to error
-			redirect('Error', 'info', array('no' => 1000));
+			errorRedirect(404);
+			exit();
 		}
+
+		// Parse ini file
+		$viewSettings = parse_ini_file($iniFile, true);
 
 		// Start HTML output
 ?>
@@ -35,51 +44,19 @@ class THINKER_View_html extends THINKER_View_Common
 <head>
 <?php
 		// Include head items
-		include_once('View/html/head.inc');
+		include_once($styleDir . "/head.inc");
 ?>
 </head>
 <body>
 <?php
 		// Include heading
-		include_once('View/html/bodyHeading.inc');
-
-		// Output messages
-		if(!empty($_MESSAGES))
-		{
-			foreach($_MESSAGES as $msg)
-			{
-				list($text, $level) = $msg;
-
-				$output = "<div class='notification ";
-
-				switch($level)
-				{
-					case 'error':
-						$output .= "error'><strong>Error:</strong> $text</div>";
-					break;
-
-					case 'success':
-						$output .= "success'><strong>Success:</strong> $text</div>";
-					break;
-
-					case 'warning':
-						$output .= "warning'><strong>Warning:</strong> $text</div>";
-					break;
-
-					default:
-						$output .= "info'><strong>Info:</strong> $text</div>";
-					break;
-				}
-
-				echo $output;
-			}
-		}
+		include_once($styleDir . "/bodyHeading.inc");
 
 		// Include body data
 		include_once($tplFile);
 
 		// Include footer
-		include_once('View/html/bodyFooter.inc');
+		include_once($styleDir . "/bodyFooter.inc");
 ?>
 </body>
 </html>
