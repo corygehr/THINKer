@@ -16,9 +16,9 @@ class THINKER_Session
 	 * Constructor for the THINKER_Session Class
 	 *
 	 * @author Cory Gehr
-	 * @access private
+	 * @access protected
 	 */
-	private function __construct()
+	protected function __construct()
 	{
 		global $_INFO;
 
@@ -116,7 +116,7 @@ class THINKER_Session
 	{
 		if(!isset(self::$instance))
 		{
-			$className = __CLASS__;
+			$className = SESSION_CLASS;
 			self::$instance = new $className;
 		}
 		
