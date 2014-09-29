@@ -10,7 +10,7 @@ session_start();
 			// Set session
 			$_SESSION['AUTH_ID'] = $_POST['password'];
 			// Redirect
-			header('index.php');
+			header('Location: index.php');
 			exit();
 		}
 	}
